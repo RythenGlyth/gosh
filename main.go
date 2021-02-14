@@ -1,34 +1,52 @@
 package main
 
 import (
-	"io"
+	"fmt"
 	"os"
+	"os/signal"
+
+	"golang.org/x/sys/unix"
+
+	"github.com/google/goterm/term"
 )
 
 func main() {
-	var out io.WriteCloser
 	var err error
-	out, err = os.OpenFile("/dev/tty", os.O_WRONLY, 0) //open our console (https://unix.stackexchange.com/questions/60641/linux-difference-between-dev-console-dev-tty-and-dev-tty0/60646#60646)
+	var backupTerm term.Termios
+	backupTerm, err = term.Attr(os.Stdin)
 	if err != nil {
-		os.Stdout.Write([]byte("Could not open /dev/tty for writing"))
+		os.Stdout.Write([]byte("Could not copy Stdin attributes into TTY: " + err.Error()))
+		os.Exit(5)
 	}
-	defer out.Close()
-	var in io.ReadCloser
-	in, err = os.OpenFile("/dev/tty", os.O_RDONLY, 0)
-	if err != nil {
-		os.Stdout.Write([]byte("Could not open /dev/tty for reading"))
-	}
-	defer in.Close()
+	myTerm := backupTerm
+	myTerm.Raw()
+	myTerm.Set(os.Stdin)
 
-	var inBuf []byte = make([]byte, 1024)
-	var byteCount int
+	defer backupTerm.Set(os.Stdin)
+
+	sig := make(chan os.Signal, 2)
+
+	os.Stdout.WriteString("STARTED")
+
+	signal.Notify(sig, unix.SIGWINCH, unix.SIGCLD)
+
+	os.Stdout.WriteString("STARTED2")
+
+	myTerm.Winsz(os.Stdin)
+
 	for {
-		byteCount, err = in.Read(inBuf)
+		var buf = make([]byte, 1024)
+		n, err := os.Stdin.Read(buf)
 		if err != nil {
-			out.Write([]byte(err.Error()))
+			os.Stdout.WriteString("E")
 		} else {
-			out.Write(inBuf[0:byteCount])
+			os.Stdout.Write([]byte(fmt.Sprintf("W: %s\n\r", buf[0:n])))
 		}
+
 	}
 
 }
+
+/*func writer() {
+	var buf = make([]byte, bufSz)
+}*/
