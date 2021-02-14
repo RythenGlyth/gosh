@@ -1,22 +1,23 @@
 package main
 
 import (
+	"encoding/hex"
 	"fmt"
 	"os"
 	"os/signal"
-
-	"golang.org/x/sys/unix"
-
-	"github.com/google/goterm/term"
 )
 
 func main() {
+	retcode := 0
+
+	defer func() { os.Exit(retcode) }()
 	var err error
 	var backupTerm term.Termios
 	backupTerm, err = term.Attr(os.Stdin)
 	if err != nil {
 		os.Stdout.Write([]byte("Could not copy Stdin attributes into TTY: " + err.Error()))
-		os.Exit(5)
+		retcode = 5
+		return
 	}
 	myTerm := backupTerm
 	myTerm.Raw()
@@ -26,11 +27,7 @@ func main() {
 
 	sig := make(chan os.Signal, 2)
 
-	os.Stdout.WriteString("STARTED")
-
 	signal.Notify(sig, unix.SIGWINCH, unix.SIGCLD)
-
-	os.Stdout.WriteString("STARTED2")
 
 	myTerm.Winsz(os.Stdin)
 
@@ -38,15 +35,21 @@ func main() {
 		var buf = make([]byte, 1024)
 		n, err := os.Stdin.Read(buf)
 		if err != nil {
-			os.Stdout.WriteString("E")
+			os.Stdout.WriteString("Error reading input")
 		} else {
-			os.Stdout.Write([]byte(fmt.Sprintf("W: %s\n\r", buf[0:n])))
+			os.Stdout.Write([]byte(fmt.Sprintf("W: %s\n\r", hex.EncodeToString(buf[0:n]))))
+			if buf[0] == 0x03 { //ctrl+c to quit
+				retcode = 0
+				return
+			}
 		}
-
 	}
 
 }
 
-/*func writer() {
-	var buf = make([]byte, bufSz)
-}*/
+func byteArrToHex(arr []byte) []byte {
+	out := make([]byte, hex.EncodedLen(len(arr)))
+	hex.Encode(out, arr)
+
+	return out
+}
