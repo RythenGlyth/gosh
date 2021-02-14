@@ -1,4 +1,4 @@
 # GOSHell
-A userfriendly costumizealbe Linux-Shell written in Golang
+A userfriendly customizable Linux-Shell written in Golang
 
 ## Still in development
