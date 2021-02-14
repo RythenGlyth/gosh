@@ -2,9 +2,11 @@ package main
 
 import (
 	"encoding/hex"
-	"fmt"
 	"os"
 	"os/signal"
+
+	"github.com/google/goterm/term"
+	"golang.org/x/sys/unix"
 )
 
 func main() {
@@ -37,7 +39,8 @@ func main() {
 		if err != nil {
 			os.Stdout.WriteString("Error reading input")
 		} else {
-			os.Stdout.Write([]byte(fmt.Sprintf("W: %s\n\r", hex.EncodeToString(buf[0:n]))))
+			//os.Stdout.Write([]byte(fmt.Sprintf("W: %s\n\r", hex.EncodeToString(buf[0:n]))))
+			os.Stdout.Write(buf[0:n])
 			if buf[0] == 0x03 { //ctrl+c to quit
 				retcode = 0
 				return
