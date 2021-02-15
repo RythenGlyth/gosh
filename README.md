@@ -1,4 +1,8 @@
 # GOSHell
-A userfriendly customizable Shell for Linux and Windows written in Golang
+GOShell (or GOSH in short) is a userfriendly customizable shell written in Golang
+
+## Supported Platforms
+- Windows
+- Linux
 
 ## Still in development

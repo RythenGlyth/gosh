@@ -1,2 +1,5 @@
 * INTRODUCTION
-  * [Overview](index.md)
+  * [Overview](README.md)
+* CUSTOMIZATION
+* GOSHScript
+* [Changelog](changelog)
