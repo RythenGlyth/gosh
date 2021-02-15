@@ -2,4 +2,4 @@
   * [Overview](README.md)
 * CUSTOMIZATION
 * GOSHScript
-* [Changelog](changelog)
+* [Changelog](CHANGELOG.md)
