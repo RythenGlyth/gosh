@@ -1,6 +1,7 @@
 <p align="center">
     <img width="128" alt="GOSH" src="./Gosh.png"><br />
-    GOSHell
+    GOSHell<br />
+    <a href="//rythenglyth.github.io/gosh/">DOCUMENTATION</a>
 </p>
 GOShell (or *gosh* in short) is a userfriendly customizable shell written in Golang
 
