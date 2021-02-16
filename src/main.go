@@ -60,6 +60,7 @@ func main() {
 		retcode = 1
 		return
 	}
+	defer MyGosh.Close()
 
 	var n int
 	var buf []byte = make([]byte, 1024)
