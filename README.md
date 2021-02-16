@@ -1,11 +1,10 @@
+<<<<<<< HEAD
 <p align="center">
     <img width="128" alt="GOSH" src="./Gosh.png"><br />
     GOSHell
 </p>
-GOShell (or GOSH in short) is a userfriendly customizable shell written in Golang
+GOShell (or *gosh* in short) is a userfriendly customizable shell written in Golang
 
-## Supported Platforms
-- Windows
-- Linux
+All major platforms (Windows, Linux, BSD, macOS) should be supported, once we update [termios](github.com/scrouthtv/termios).
 
 ## Still in development
