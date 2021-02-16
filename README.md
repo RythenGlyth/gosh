@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 <p align="center">
     <img width="128" alt="GOSH" src="./Gosh.png"><br />
     GOSHell
