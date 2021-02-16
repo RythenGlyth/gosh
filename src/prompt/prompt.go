@@ -3,7 +3,7 @@ package prompt
 import (
 	"io"
 
-	"gosh/utf8"
+	"github.com/scrouthtv/termios/utf8"
 )
 
 type Prompt struct {
@@ -28,7 +28,7 @@ func (p *Prompt) OnKey(key utf8.Key) {
 		p.currentLine = append(p.currentLine, 0xC3, key.Value)
 	case utf8.KeySpecial:
 		switch key.Value {
-		case utf8.Backspace:
+		case utf8.SpecialBackspace:
 			p.currentLine = p.currentLine[:len(p.currentLine)-1]
 		}
 	}

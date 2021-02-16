@@ -1,4 +1,6 @@
 github.com/scrouthtv/termios v0.0.0-20210216072851-8201aeffb6f6 h1:DtQtwT0qIV0nrRS5gXRx1PqVQV/rgXIoWhTkKJejobs=
 github.com/scrouthtv/termios v0.0.0-20210216072851-8201aeffb6f6/go.mod h1:smp1vVRZ1Piw3IZsR8UBEfV7gSQPlhSB/J/w+6TsfMw=
+github.com/scrouthtv/termios/utf8 v0.0.0-20210216125743-1b0887406147 h1:Ha89gUsHuy+47suRoePp5vQfFm90+al5nqHfNTZgE4U=
+github.com/scrouthtv/termios/utf8 v0.0.0-20210216125743-1b0887406147/go.mod h1:X2DSHmRPgPjcQiq2Okqa3MxbGuctlTrUBjUDytfFH9w=
 golang.org/x/sys v0.0.0-20210124154548-22da62e12c0c h1:VwygUrnw9jn88c4u8GD3rZQbqrP/tgas88tPUbBxQrk=
 golang.org/x/sys v0.0.0-20210124154548-22da62e12c0c/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=

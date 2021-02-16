@@ -5,9 +5,9 @@ import (
 	"fmt"
 
 	"gosh/prompt"
-	"gosh/utf8"
 
 	"github.com/scrouthtv/termios"
+	"github.com/scrouthtv/termios/utf8"
 )
 
 var MyGosh *Gosh
