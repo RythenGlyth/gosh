@@ -2,6 +2,7 @@ package main
 
 import (
 	"os"
+	"fmt"
 
 	"gosh/prompt"
 	"gosh/utf8"
@@ -67,7 +68,7 @@ func main() {
 	var key utf8.Key
 	var keys []utf8.Key
 
-	MyGosh.term.Write([]byte("This is gosh v0.0.1. Press C-d to exit.\r\n"))
+	MyGosh.term.Write([]byte(fmt.Sprintf("This is %s %s. Press C-d to exit.\r\n", GoshName, GoshVersion)))
 
 	for {
 		n, err = MyGosh.term.Read(buf)
