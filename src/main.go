@@ -1,58 +1,89 @@
 package main
 
 import (
-	"encoding/hex"
 	"os"
-	"os/signal"
 
-	"github.com/google/goterm/term"
-	"golang.org/x/sys/unix"
+	"gosh/prompt"
+	"gosh/utf8"
+
+	"github.com/scrouthtv/termios"
 )
 
-func main() {
-	retcode := 0
+var MyGosh *Gosh
 
-	defer func() { os.Exit(retcode) }()
+type Gosh struct {
+	term termios.Terminal
+	p *prompt.Prompt
+	ready bool
+}
+
+func NewGosh() (*Gosh) {
+	return &Gosh{nil, nil, false}
+}
+
+func (g *Gosh) Init() error {
 	var err error
-	var backupTerm term.Termios
-	backupTerm, err = term.Attr(os.Stdin)
+	var term termios.Terminal
+	term, err = termios.Open()
 	if err != nil {
-		os.Stdout.Write([]byte("Could not copy Stdin attributes into TTY: " + err.Error()))
-		retcode = 5
+		return err
+	}
+	err = term.SetRaw(true)
+	if err != nil {
+		return err
+	}
+	g.term = term
+
+	g.p = prompt.NewPrompt(term)
+	return nil
+}
+
+func (g *Gosh) Close() {
+	g.ready = false
+	if (g.term != nil) {
+		g.term.Close()
+	}
+}
+
+func main() {
+	var retcode int = 0
+	defer func() { os.Exit(retcode) }()
+
+	MyGosh = NewGosh()
+
+	var err error
+	err = MyGosh.Init()
+	if err != nil {
+		os.Stdout.WriteString("Error occured during intialization:")
+		os.Stdout.WriteString(err.Error())
+		os.Stdout.WriteString("\n")
+		retcode = 1
 		return
 	}
-	myTerm := backupTerm
-	myTerm.Raw()
-	myTerm.Set(os.Stdin)
 
-	defer backupTerm.Set(os.Stdin)
+	var n int
+	var buf []byte = make([]byte, 1024)
+	var key utf8.Key
+	var keys []utf8.Key
 
-	sig := make(chan os.Signal, 2)
-
-	signal.Notify(sig, unix.SIGWINCH, unix.SIGCLD)
-
-	myTerm.Winsz(os.Stdin)
+	MyGosh.term.Write([]byte("This is gosh v0.0.1. Press C-d to exit.\r\n"))
 
 	for {
-		var buf = make([]byte, 1024)
-		n, err := os.Stdin.Read(buf)
+		n, err = MyGosh.term.Read(buf)
 		if err != nil {
-			os.Stdout.WriteString("Error reading input")
+			// Consider MyGosh.term broken:
+			os.Stdout.WriteString("Error reading input\n")
 		} else {
-			//os.Stdout.Write([]byte(fmt.Sprintf("W: %s\n\r", hex.EncodeToString(buf[0:n]))))
-			os.Stdout.Write(buf[0:n])
-			if buf[0] == 0x03 { //ctrl+c to quit
+			if buf[0] == 0x04 { // C-d to quit
 				retcode = 0
 				return
+			} else {
+				keys = utf8.ParseUTF8(buf[:n])
+				for _, key = range keys {
+					MyGosh.p.OnKey(key)
+				}
 			}
 		}
 	}
 
-}
-
-func byteArrToHex(arr []byte) []byte {
-	out := make([]byte, hex.EncodedLen(len(arr)))
-	hex.Encode(out, arr)
-
-	return out
 }
