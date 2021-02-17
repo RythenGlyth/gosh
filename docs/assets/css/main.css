@@ -10,3 +10,11 @@
     --mono-tint2: hsl(var(--mono-hue), var(--mono-saturation), 25%);
     --mono-tint3: hsl(var(--mono-hue), var(--mono-saturation), 33%);
 }
+
+*::-webkit-scrollbar {
+    width: 12px !important;
+    height: 12px !important;
+}
+*::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.2);
+}
