@@ -74,4 +74,5 @@ type Token struct {
 	tokenType TokenType
 	startPos  int
 	endPos    int
+	value     string
 }
