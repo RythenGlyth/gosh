@@ -25,7 +25,44 @@
       themeColor: '#1e90df',
       coverpage: true,
       logo: './assets/Gosh.png',
-      plugins: []
+      subMaxLevel: 5,
+      auto2top: true,
+      pagination: {
+        crossChapter: true,
+        crossChapterText: true,
+      },
+      notFoundPage: '404.md',
+      plugins: [
+        (hook, vm) => {
+          var nextHref;
+          var lastHref;
+          hook.doneEach(() => {
+              update();
+          });
+          window.addEventListener("keydown", (ev) => {
+            if(ev.key == 'ArrowLeft') {
+              if(lastHref) {
+                lastHref.click();
+                //document.location.href = lastHref;
+                update();
+              }
+            }
+            if(ev.key == 'ArrowRight') {
+              if(nextHref)  {
+                nextHref.click();
+                //document.location.href = nextHref;
+                update();
+              }
+            }
+          })
+          var update = () => {
+            var allHrefs = Array.from(document.querySelectorAll(".sidebar li a"))/*.filter(e => !e.classList.contains("section-link"))*/;
+            var currIndex = allHrefs.findIndex(e => e.hash == window.location.hash)
+            lastHref = allHrefs[currIndex-1]
+            nextHref = allHrefs[currIndex+1]
+          }
+        }
+      ]
     }
   </script>
   <!-- Docsify v4 -->
