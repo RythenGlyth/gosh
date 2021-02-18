@@ -35,10 +35,13 @@
       plugins: [
         (hook, vm) => {
           hook.doneEach(() => {
-            if(document.querySelector(".cover.show")) {
+            var el = document.querySelector(".cover.show");
+            if(el) {
               window.addEventListener("wheel", (ev) => {
                 if(ev.deltaY > 0) {
-                  Array.from(document.querySelectorAll("a")).filter(e => e.origin == window.location.origin && e.hash == "#/?id=main")[0].click();
+                  setTimeout(() => {
+                    Array.from(document.querySelectorAll("a")).filter(e => e.origin == window.location.origin && e.hash == "#/?id=main")[0].click();
+                  })
                 }
                 if(window.scrollY -ev.deltaY <= 0) {
                   window.location.hash = ""
