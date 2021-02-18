@@ -2,13 +2,14 @@
     --mono-hue: 255;
     --mono-saturation: 0%;
 
-    --mono-shade3: hsl(var(--mono-hue), var(--mono-saturation), 3%);
-    --mono-shade2: hsl(var(--mono-hue), var(--mono-saturation), 5%);
-    --mono-shade1: hsl(var(--mono-hue), var(--mono-saturation), 7%);
+    --mono-shade3: hsl(var(--mono-hue), var(--mono-saturation), 6%);
+    --mono-shade2: hsl(var(--mono-hue), var(--mono-saturation), 8%);
+    --mono-shade1: hsl(var(--mono-hue), var(--mono-saturation), 9%);
     --mono-base: hsl(var(--mono-hue), var(--mono-saturation), 12%);
     --mono-tint1: hsl(var(--mono-hue), var(--mono-saturation), 18%);
     --mono-tint2: hsl(var(--mono-hue), var(--mono-saturation), 25%);
     --mono-tint3: hsl(var(--mono-hue), var(--mono-saturation), 33%);
+    --link-color: #5393f9;
 }
 
 *::-webkit-scrollbar {

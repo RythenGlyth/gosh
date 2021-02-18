@@ -9,23 +9,23 @@
   <link rel="stylesheet" href="assets/css/main.css">
 </head>
 <body>
-  <div id="app"></div>
+  <div id="app">Please wait...</div>
   <script>
     window.$docsify = {
-        name: 'GOSHell',
-        repo: 'https://github.com/RythenGlyth/gosh',
-        loadNavbar: false,
-        loadSidebar: true,
-        fallbackLanguages: [''],
-        alias: {
-            '.*?/CHANGELOG.md': 'https://raw.githubusercontent.com/RythenGlyth/gosh/main/CHANGELOG.md'
-        },
-        search: 'auto',
-        themeColor: '#1e90df',
-        coverpage: true,
-        logo: './assets/Gosh.png',
-        plugins: [
-        ]
+      el: '#app',
+      name: 'GOSHell',
+      repo: 'https://github.com/RythenGlyth/gosh',
+      loadNavbar: false,
+      loadSidebar: true,
+      fallbackLanguages: [''],
+      alias: {
+          '.*?/CHANGELOG.md': 'https://raw.githubusercontent.com/RythenGlyth/gosh/main/CHANGELOG.md'
+      },
+      search: 'auto',
+      themeColor: '#1e90df',
+      coverpage: true,
+      logo: './assets/Gosh.png',
+      plugins: []
     }
   </script>
   <!-- Docsify v4 -->
