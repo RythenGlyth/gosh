@@ -3,5 +3,9 @@
   * [Installation](INSTALLATION.md)
 * CUSTOMIZATION
 * [GOSHScript](goshscript/GOSHSCRIPT.md)
+  * [Variables](goshscript/VARIABLES.md)
   * [Strings](goshscript/STRINGS.md)
+  * [Numbers](goshscript/NUMBERS.md)
+  * [Functions](goshscript/FUNCTIONS.md)
+  * [Arrays](goshscript/ARRAYS.md)
 * [Changelog](CHANGELOG.md)
