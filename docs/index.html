@@ -5,6 +5,7 @@
   <title>GOSHell Documentation</title>
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+  <link rel="icon" href="assets/Gosh.png" />
   <link rel="stylesheet" href="https://unpkg.com/docsify-themeable/dist/css/theme-simple-dark.css">
   <link rel="stylesheet" href="assets/css/main.css">
 </head>
@@ -25,7 +26,61 @@
       themeColor: '#1e90df',
       coverpage: true,
       logo: './assets/Gosh.png',
-      plugins: []
+      subMaxLevel: 5,
+      auto2top: true,
+      pagination: {
+        crossChapter: true,
+        crossChapterText: true,
+      },
+      notFoundPage: '404.md',
+      plugins: [
+        (hook, vm) => {
+          hook.doneEach(() => {
+            var el = document.querySelector(".cover.show");
+            if(el) {
+              window.addEventListener("wheel", (ev) => {
+                if(ev.deltaY > 0) {
+                  setTimeout(() => {
+                    Array.from(document.querySelectorAll("a")).filter(e => e.origin == window.location.origin && e.hash == "#/?id=main")[0].click();
+                  })
+                }
+                if(window.scrollY -ev.deltaY <= 0) {
+                  window.location.hash = ""
+                }
+              });
+            }
+          });
+        },
+        (hook, vm) => {
+          var nextHref;
+          var lastHref;
+          hook.doneEach(() => {
+              update();
+          });
+          window.addEventListener("keydown", (ev) => {
+            if(ev.key == 'ArrowLeft') {
+              if(lastHref) {
+                lastHref.click();
+                //document.location.href = lastHref;
+                update();
+              }
+            }
+            if(ev.key == 'ArrowRight') {
+              if(nextHref)  {
+                nextHref.click();
+                //document.location.href = nextHref;
+                update();
+              }
+            }
+          })
+          var update = () => {
+            var allHrefs = Array.from(document.querySelectorAll(".sidebar li a"))/*.filter(e => !e.classList.contains("section-link"))*/;
+            var currIndex = allHrefs.findIndex(e => e.hash == window.location.hash)
+            lastHref = allHrefs[currIndex-1]
+            nextHref = allHrefs[currIndex+1]
+          }
+        }
+      ]
     }
   </script>
   <!-- Docsify v4 -->
