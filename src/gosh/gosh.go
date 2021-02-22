@@ -84,13 +84,15 @@ func (g *Gosh) Interactive() (int, error) {
 			for _, k = range in {
 				if k.Equal(&keyCd) { // C-d to quit
 					return 0, nil
-				} else {
-					// TODO event handling
-					//  -> plugin management
-					g.prompt.OnKey(k)
 				}
 
+				// TODO event handling
+				//  -> plugin management
+				g.prompt.OnKey(k)
+
 				if !g.ready {
+					// If the terminal has been closed because of that key,
+					// return:
 					return 0, nil
 				}
 			}

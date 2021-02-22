@@ -20,11 +20,13 @@ type Prompt struct {
 // PromptStyle are individual styles for the prompt.
 // They create prompt text to the left and right.
 type PromptStyle interface {
+
 	// LeftPrompt returns the contents of the area to the left of the prompt.
 	// The int parameter indicates which prompt line is requested (starting with 0).
 	// All paddings and margins must be added inside the prompt style, as the style will
 	// be printed as-is and with no added spaces.
 	LeftPrompt(*Gosh, int) string
+
 	// RightPrompt returns the contents of the area on the right side of the screen.
 	// The contents should be returned from left to right
 	RightPrompt(*Gosh, int) string
@@ -105,9 +107,14 @@ func (p *Prompt) redraw() {
 	p.parent.WriteString(line)
 
 	var rightPrompt string = p.style.RightPrompt(p.parent, 0)
-	p.parent.WriteString("\033[50G") // move to column 50, TODO move it so the text is printed to the right border
+	var width uint16 = p.parent.term.GetSize().Width
+	if width == 0 {
+		width = 80
+	}
+	var position int = int(width) - utf8.RuneCountInString(rightPrompt)
+	p.parent.WriteString("\033[" + strconv.Itoa(position) + "G") // move to column 50, TODO move it so the text is printed to the right border
 	p.parent.WriteString(rightPrompt)
 
-	var position int = utf8.RuneCountInString(leftPrompt) + pos + 2
+	position = utf8.RuneCountInString(leftPrompt) + pos + 2
 	p.parent.WriteString("\033[" + strconv.Itoa(position) + "G") // set cursor position
 }

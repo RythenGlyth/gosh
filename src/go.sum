@@ -9,6 +9,12 @@ github.com/scrouthtv/termios v0.0.0-20210222145407-e62fe1277f2d h1:FJIAsCYC4t+3g
 github.com/scrouthtv/termios v0.0.0-20210222145407-e62fe1277f2d/go.mod h1:heZd3KzQA4HM3Qyvnjj4rn3PmBn/nGHlgOsrxdrWhlY=
 github.com/scrouthtv/termios v0.0.0-20210222150922-9390d11380ae h1:Qr4AqPkOpGfCkiQP+myGKZZry7UEC4z2UJUWrNzMySQ=
 github.com/scrouthtv/termios v0.0.0-20210222150922-9390d11380ae/go.mod h1:heZd3KzQA4HM3Qyvnjj4rn3PmBn/nGHlgOsrxdrWhlY=
+github.com/scrouthtv/termios v0.0.0-20210222210906-bef29ac65e7f h1:pDCsONcsOCJds5ILaRb/OvRxQZFw6+hI6rzF+3cJAwc=
+github.com/scrouthtv/termios v0.0.0-20210222210906-bef29ac65e7f/go.mod h1:heZd3KzQA4HM3Qyvnjj4rn3PmBn/nGHlgOsrxdrWhlY=
+github.com/scrouthtv/termios v0.0.0-20210222212101-93e9b24fcff7 h1:ZnYVRLOfRjY0jerJnkZttkLqrKT5yGUT0Mq/IBVgeaE=
+github.com/scrouthtv/termios v0.0.0-20210222212101-93e9b24fcff7/go.mod h1:heZd3KzQA4HM3Qyvnjj4rn3PmBn/nGHlgOsrxdrWhlY=
+github.com/scrouthtv/termios v0.0.0-20210222212311-f164ab75ef72 h1:0NSDq5DXl2YLN/0ptcwy3gU7PgnM0B3909ozZTVh2ao=
+github.com/scrouthtv/termios v0.0.0-20210222212311-f164ab75ef72/go.mod h1:heZd3KzQA4HM3Qyvnjj4rn3PmBn/nGHlgOsrxdrWhlY=
 github.com/scrouthtv/termios/keys v0.0.0-20210216182453-ede925176118 h1:eOaaYN4PTqK9K945pDtxIPNzw7cOtCNtOrHIb+Nr7a4=
 github.com/scrouthtv/termios/keys v0.0.0-20210216182453-ede925176118/go.mod h1:ZHwKahLsuHH+r/PbaptrMi4YzAerKWw6KDn/hCwWwLY=
 github.com/scrouthtv/termios/keys v0.0.0-20210216185427-dee6bbf46613 h1:fILNfEUQ2BRWJhXToEejrgcYQ8eHWzL79M6Npx/jxdI=
