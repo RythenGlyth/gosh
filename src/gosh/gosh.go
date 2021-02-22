@@ -3,6 +3,7 @@ package gosh
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/scrouthtv/termios"
 )
@@ -102,15 +103,48 @@ func (g *Gosh) Interactive() (int, error) {
 
 // Eval evaluates the specified statement in the current namespace
 func (g *Gosh) Eval(line string) {
-	if line == "exit" {
+	var parts []string = strings.Split(line, " ")
+	if len(parts) == 0 {
+		return
+	}
+
+	if parts[0] == "exit" {
 		g.WriteString("Goodbye.")
 		g.Close()
+	} else if parts[0] == "cd" {
+		var err error
+		if len(parts) == 1 {
+			home, _ := os.UserHomeDir()
+			err = g.changeWD(home)
+		} else {
+			err = g.changeWD(parts[1])
+		}
+
+		if err != nil {
+			g.WriteString("Error: ")
+			g.WriteString(err.Error())
+			g.WriteString("\r\n")
+		}
 	} else {
 		g.WriteString("Unknown command '")
 		g.WriteString(line)
 		g.WriteString("'")
 		g.WriteString("\r\n")
 	}
+}
+
+func (g *Gosh) changeWD(target string) error {
+	return os.Chdir(target)
+}
+
+// GetWD returns a string representation of the current working directory
+// or ~ if any error occured (e. g. the directory was deleted).
+func (g *Gosh) GetWD() string {
+	wd, err := os.Getwd()
+	if err != nil {
+		return "~"
+	}
+	return wd
 }
 
 func (g *Gosh) Write(p []byte) (int, error) {
