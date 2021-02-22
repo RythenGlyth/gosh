@@ -1,6 +1,8 @@
 package gosh
 
 import (
+	"container/list"
+	"gosh/util"
 	"strconv"
 	"unicode/utf8"
 
@@ -9,10 +11,10 @@ import (
 
 // Prompt is responsible for drawing the UI of an interactive Gosh
 type Prompt struct {
-	line   []rune
+	line   *list.List
 	parent *Gosh
 	style  PromptStyle
-	pos    int
+	pos    *list.Element // points to the element to the left of the cursor
 }
 
 // PromptStyle are individual styles for the prompt.
@@ -30,18 +32,21 @@ type PromptStyle interface {
 
 // NewPrompt creates a new prompt with the SimplePromptStyle style.
 func NewPrompt(parent *Gosh) *Prompt {
-	return &Prompt{nil, parent, &SimplePromptStyle{}, 0}
+	return &Prompt{list.New(), parent, &SimplePromptStyle{}, nil}
 }
 
 func (p *Prompt) doBackspace() {
-	if p.pos == 0 {
+	if p.line.Len() == 0 {
 		return
-	} else if p.pos == len(p.line)+1 {
-		p.pos--
-		p.line = p.line[:len(p.line)-1]
+	}
+
+	var newPos *list.Element = p.pos.Prev()
+	p.line.Remove(p.pos)
+
+	if p.line.Len() == 0 {
+		p.pos = nil
 	} else {
-		copy(p.line[p.pos:], p.line[p.pos+1:])
-		p.pos--
+		p.pos = newPos
 	}
 }
 
@@ -50,25 +55,32 @@ func (p *Prompt) OnKey(key termios.Key) {
 	if key == termios.InvalidKey {
 		p.redraw()
 	} else if key.Type == termios.KeyLetter {
-		p.line = append(p.line, key.Value)
-		p.pos++
+		if p.pos == nil {
+			p.line.PushBack(key.Value)
+			p.pos = p.line.Back()
+		} else {
+			p.line.InsertAfter(key.Value, p.pos)
+			p.pos = p.pos.Next()
+		}
 	} else if key.Type == termios.KeySpecial {
 		switch key.Value {
 		case termios.SpecialBackspace:
-			if len(p.line) > 0 {
-				p.doBackspace()
-			}
+			p.doBackspace()
 		case termios.SpecialEnter:
-			p.pos = 0
-			p.line = nil
+			var line string = util.RuneListToString(p.line)
+
+			p.pos = nil
+			p.line = list.New()
 			p.parent.WriteString("\r\n")
+
+			p.parent.Eval(line)
 		case termios.SpecialArrowLeft:
-			if p.pos > 0 {
-				p.doBackspace()
+			if p.pos != p.line.Front() {
+				p.pos = p.pos.Prev()
 			}
 		case termios.SpecialArrowRight:
-			if p.pos < len(p.line) {
-				p.pos++
+			if p.pos != p.line.Back() {
+				p.pos = p.pos.Next()
 			}
 		}
 	}
@@ -83,12 +95,19 @@ func (p *Prompt) redraw() {
 	var leftPrompt string = p.style.LeftPrompt(p.parent, 0)
 	p.parent.WriteString(leftPrompt)
 
-	p.parent.WriteString(string(p.line))
+	var line string = util.RuneListToString(p.line)
+	var pos int = util.PositionInList(p.line, p.pos)
+	// theoretically this could be done in a single loop, but I don't want to
+	if pos == -1 && p.line.Len() > 0 {
+		pos = 0
+	}
+
+	p.parent.WriteString(line)
 
 	var rightPrompt string = p.style.RightPrompt(p.parent, 0)
 	p.parent.WriteString("\033[50G") // move to column 50, TODO move it so the text is printed to the right border
 	p.parent.WriteString(rightPrompt)
 
-	var position int = utf8.RuneCountInString(leftPrompt) + p.pos + 1
+	var position int = utf8.RuneCountInString(leftPrompt) + pos + 2
 	p.parent.WriteString("\033[" + strconv.Itoa(position) + "G") // set cursor position
 }

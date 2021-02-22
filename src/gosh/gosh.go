@@ -89,8 +89,25 @@ func (g *Gosh) Interactive() (int, error) {
 					//  -> plugin management
 					g.prompt.OnKey(k)
 				}
+
+				if !g.ready {
+					return 0, nil
+				}
 			}
 		}
+	}
+}
+
+// Eval evaluates the specified statement in the current namespace
+func (g *Gosh) Eval(line string) {
+	if line == "exit" {
+		g.WriteString("Goodbye.")
+		g.Close()
+	} else {
+		g.WriteString("Unknown command '")
+		g.WriteString(line)
+		g.WriteString("'")
+		g.WriteString("\r\n")
 	}
 }
 
