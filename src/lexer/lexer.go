@@ -31,7 +31,7 @@ type Lexer struct {
 
 // NewLexer creates a new Lexer
 func NewLexer(source []rune, length int, inputName string) *Lexer {
-	return &Lexer{source, -1, 1, 0, length, false, inputName, '\x00'}
+	return &Lexer{source, -1, 1, 1, length, false, inputName, '\x00'}
 }
 
 // Lex into tokens
@@ -43,7 +43,9 @@ func (lex *Lexer) Lex() (*[]Token, *LexError) {
 		if err != nil {
 			return &tokens, err
 		}
-		tokens = append(tokens, *token)
+		if token.tokenType != ttEmpty {
+			tokens = append(tokens, *token)
+		}
 	}
 	return &tokens, nil
 }
@@ -57,14 +59,16 @@ loop:
 		if lex.position >= lex.length {
 			break loop
 		}
+		if unicode.IsSpace(lex.character) {
+			if lex.character == '\n' {
+				lex.codeXPos = 0
+				lex.codeYPos++
+			}
+			lex.next()
+			continue
+		}
 		switch lex.character {
-		case ' ', '\t', '\f', '\r':
-			lex.next()
-		case '\n':
-			lex.codeXPos = 0
-			lex.codeYPos++
-			lex.next()
-		case ';', ',', '.', '(', ')', '[', ']', '{', '}', '%', '*':
+		case ';', ',', '.', '(', ')', '[', ']', '{', '}':
 			tokenType = TokenType(string(lex.character))
 			break loop
 		case '"', '\'':
@@ -81,7 +85,67 @@ loop:
 			tokenType = ttString
 			fmt.Print("sos")
 			break loop
+		case '0':
+			if lex.position+1 < lex.length {
+				switch lex.buffer[lex.position+1] {
+				case 'b', 'B':
+					lex.next()
+					/*var binaryStringBuilder strings.Builder
+					for lex.position+1 < lex.length && unicode.Is(BinaryRangeTable, lex.buffer[lex.position+1]) {
+						lex.next()
+						binaryStringBuilder.WriteRune(lex.character)
+					}
+					parsed, err := strconv.ParseInt(binaryStringBuilder.String(), 2, 64)
+					if err != nil {
+						return nil, &LexError{errors.New("Cannot read binary: " + err.Error()), lex.codeXPos, lex.codeYPos, lex.position, lex}
+					}
+					tokenType = ttNumber
+					valueBuilder.WriteString(fmt.Sprint(parsed))
+					break loop*/
+					val, err := lex.readNumber(2)
+					if err != nil {
+						return nil, err
+					}
+					tokenType = ttNumber
+					valueBuilder.WriteString(fmt.Sprint(val))
+					break loop
+				case 'x', 'X':
+					lex.next()
+					/*var hexStringBuilder strings.Builder
+					for lex.position+1 < lex.length && unicode.Is(unicode.Hex_Digit, lex.buffer[lex.position+1]) {
+						lex.next()
+						hexStringBuilder.WriteRune(lex.character)
+					}
+					parsed, err := strconv.ParseInt(hexStringBuilder.String(), 16, 64)
+					if err != nil {
+						return nil, &LexError{errors.New("Cannot read hex: " + err.Error()), lex.codeXPos, lex.codeYPos, lex.position, lex}
+					}
+					tokenType = ttNumber
+					valueBuilder.WriteString(fmt.Sprint(parsed))
+					break loop*/
+					val, err := lex.readNumber(16)
+					if err != nil {
+						return nil, err
+					}
+					tokenType = ttNumber
+					valueBuilder.WriteString(fmt.Sprint(val))
+					break loop
+				//0rn:hhh... (number with specific radix) n=radix (between 2 and 36), h=number itself
+				case 'r', 'R':
+					break loop
+				}
+			}
+			fallthrough
+		case '1', '2', '3', '4', '5', '6', '7', '8', '9':
+			val, err := lex.readNumber(10)
+			if err != nil {
+				return nil, err
+			}
+			tokenType = ttNumber
+			valueBuilder.WriteString(fmt.Sprint(val))
+			break loop
 		default:
+			return nil, &LexError{errors.New("Unknown Token"), lex.codeXPos, lex.codeYPos, lex.position, lex}
 			//fmt.Print("sas")
 		}
 	}
@@ -107,8 +171,6 @@ func (lex *Lexer) nextB(wasBackslash bool) *LexError {
 	}
 	if lex.position >= 0 && lex.position < lex.length {
 		if lex.wasBackslash {
-			fmt.Print(" sas")
-			fmt.Print(string(lex.buffer[lex.position]) + " ")
 			switch lex.buffer[lex.position] {
 			case 'b':
 				lex.character = '\b'
@@ -129,14 +191,16 @@ func (lex *Lexer) nextB(wasBackslash bool) *LexError {
 			case '"':
 				lex.character = '"'
 			case 'x', 'u', 'U':
-				hexString := string(lex.buffer[lex.position+1])
-				lex.position++
+				var hexStringBuilder strings.Builder
+				hexStringBuilder.WriteRune(lex.buffer[lex.position+1])
+				lex.nextPos()
 				for unicode.Is(unicode.Hex_Digit, lex.buffer[lex.position+1]) {
-					hexString += string(lex.buffer[lex.position+1])
-					lex.position++
+					hexStringBuilder.WriteRune(lex.buffer[lex.position+1])
+					lex.nextPos()
 				}
 				var err error
 				var decoded int64
+				hexString := hexStringBuilder.String()
 				decoded, err = strconv.ParseInt(hexString, 16, 64)
 				if err != nil {
 					return &LexError{errors.New("can't decode " + hexString + " in hex format"), lex.codeXPos, lex.codeYPos, lex.position, lex}
@@ -156,9 +220,57 @@ func (lex *Lexer) nextPos() {
 	lex.codeXPos++
 	if lex.position >= 0 && lex.position < lex.length {
 		fmt.Print(hex.EncodeToString([]byte(string(lex.buffer[lex.position : lex.position+1]))))
-		fmt.Print(": " + strconv.FormatBool(lex.wasBackslash))
+		fmt.Print(": " + strconv.FormatBool(lex.wasBackslash) + " : " + fmt.Sprint(lex.codeXPos))
 		defer fmt.Print("\n")
 	}
+}
+
+func (lex *Lexer) readNumber(radix int) (int, *LexError) {
+	var currentVal int
+loop:
+	for {
+		if lex.position+1 >= lex.length {
+			break loop
+		}
+		if lex.buffer[lex.position+1] == '.' {
+			lex.next()
+			var decVal int
+		decLoop:
+			for {
+				var thisVal = getNumberValue(lex.buffer[lex.position+1])
+				if thisVal > 0 && thisVal < radix {
+
+				} else {
+					break decLoop
+				}
+			}
+			currentVal += decVal
+			break loop
+		} else {
+			var thisVal = getNumberValue(lex.buffer[lex.position+1])
+			if thisVal > 0 && thisVal < radix {
+				currentVal += thisVal
+				currentVal *= radix
+				lex.next()
+			} else {
+				break loop
+			}
+		}
+	}
+	return currentVal, nil
+}
+
+func getNumberValue(char rune) int {
+	if char >= '0' && char <= '9' {
+		return (int)(char - '0')
+	}
+	if char >= 'A' && char <= 'Z' {
+		return (int)(char - 'A' + 10)
+	}
+	if char >= 'a' && char <= 'z' {
+		return (int)(char - 'a' + 10)
+	}
+	return -1
 }
 
 //LexError is the type of error thrown by the lexer
@@ -172,5 +284,12 @@ type LexError struct {
 
 //SPrint s the lexer error into a string
 func (lexErr *LexError) SPrint() string {
-	return ("Error while Lexing:" + "\n" + lexErr.lexer.inputName + ":" + fmt.Sprint(lexErr.codeYPos) + ":" + fmt.Sprint(lexErr.codeXPos) + ": " + lexErr.err.Error() + "\n" + string(lexErr.lexer.buffer[int(math.Max(float64(lexErr.bufPos-10), float64(0))):int(math.Min(float64(lexErr.bufPos+10), float64(lexErr.lexer.length-1)))]))
+	return ("Error while Lexing:" + "\n" + lexErr.lexer.inputName + ":" + fmt.Sprint(lexErr.codeYPos) + ":" + fmt.Sprint(lexErr.codeXPos) + ": " + lexErr.err.Error() + "\n" + string(lexErr.lexer.buffer[int(math.Max(float64(lexErr.bufPos-10), float64(0))):int(math.Min(float64(lexErr.bufPos+10), float64(lexErr.lexer.length-1)))]) + "\n" + strings.Repeat(" ", (lexErr.bufPos-int(math.Max(float64(lexErr.bufPos-10), float64(0))))) + "^")
+}
+
+//BinaryRangeTable is a set of 0 and 1
+var BinaryRangeTable = &unicode.RangeTable{
+	R16: []unicode.Range16{
+		{0x0030, 0x0031, 1},
+	},
 }

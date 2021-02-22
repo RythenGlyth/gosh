@@ -5,8 +5,7 @@ type TokenType string
 
 const (
 	//if nothing was found
-	ttEmpty TokenType = "empty"
-	//string without quotes, could be a string or things like if or for, need to be of the following form: [A-z_][A-z0-9_\-/]* (can only start with  (until space)
+	ttEmpty      TokenType = "empty"
 	ttIdentifier TokenType = "identifier"
 	//variables identifier need to be of the following form: [$§][A-z_]+[A-z0-9_]*
 	//public variables identifier, starting with $ (until space)
@@ -15,8 +14,15 @@ const (
 	ttPrivVarIdent TokenType = "privVarIdent"
 	//string surrounded by quotes
 	ttString TokenType = "string"
+	//string without quotes, need to be of the following form: [A-z_].* (until space)
+	ttStringNQ TokenType = "stringNQ"
 	//number in decimal, could also be in base 2 (0b) or in hex (0x)
 	ttNumber TokenType = "number"
+
+	ttIf     TokenType = "if"
+	ttElse   TokenType = "else"
+	ttFor    TokenType = "for"
+	ttReturn TokenType = "return"
 
 	ttLParen    TokenType = "("
 	ttRParen    TokenType = ")"
@@ -27,11 +33,11 @@ const (
 	ttSemicolon TokenType = ";"
 	ttComma     TokenType = ","
 	ttDot       TokenType = "."
+
 	//Modulo
 	ttPercent TokenType = "%"
 	//multiplication
 	ttStar TokenType = "*"
-
 	//division
 	ttSlash TokenType = "/"
 	//Line Comment
@@ -66,7 +72,14 @@ const (
 	//Pipe left into right
 	ttBar TokenType = "|"
 	//Two Commands async at a time
-	ttAnd TokenType = "&"
+	ttAnd     TokenType = "&"
+	ttPlusEq  TokenType = "+="
+	ttMinusEq TokenType = "-="
+	ttStarEq  TokenType = "*="
+	ttSlashEq TokenType = "/="
+	ttPerEq   TokenType = "%="
+	ttEqGt    TokenType = "=>"
+	ttMinusGt TokenType = "->"
 )
 
 //Token for the Lexer

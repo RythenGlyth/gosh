@@ -25,4 +25,6 @@ func TestLexer(t *testing.T) {
 		log.Fatal(lerr.SPrint())
 	}
 	t.Logf("\n%v\n", *tokens)
+
+	t.Logf("%v", getNumberValue('a'))
 }
