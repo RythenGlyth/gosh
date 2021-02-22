@@ -2,7 +2,9 @@ package gosh
 
 import (
 	"fmt"
+	"io"
 	"os"
+	"os/exec"
 	"strings"
 
 	"github.com/scrouthtv/termios"
@@ -76,7 +78,9 @@ func (g *Gosh) Interactive() (int, error) {
 	g.prompt.redraw()
 
 	for {
+		g.term.SetRaw(true)
 		in, err = g.term.Read()
+		g.term.SetRaw(false)
 		if err != nil {
 			// Consider g.term broken:
 			os.Stdout.WriteString("Error reading input:\n")
@@ -125,6 +129,26 @@ func (g *Gosh) Eval(line string) {
 			g.WriteString(err.Error())
 			g.WriteString("\r\n")
 		}
+	} else if parts[0] == "gst" {
+		var cmd *exec.Cmd = exec.Command("git", "status")
+
+		inPipe, inErr := cmd.StdinPipe()
+		outPipe, outErr := cmd.StdoutPipe()
+		errPipe, errErr := cmd.StderrPipe()
+
+		if inErr != nil || outErr != nil || errErr != nil {
+			g.WriteString("Error running the command: \r\n")
+			g.WriteString(inErr.Error() + "\r\n")
+			g.WriteString(outErr.Error() + "\r\n")
+			g.WriteString(errErr.Error() + "\r\n")
+		}
+
+		go io.Copy(inPipe, os.Stdin)
+		go io.Copy(os.Stdout, outPipe)
+		go io.Copy(os.Stdout, errPipe)
+
+		cmd.Start()
+		cmd.Wait()
 	} else {
 		g.WriteString("Unknown command '")
 		g.WriteString(line)
