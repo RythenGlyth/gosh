@@ -1,4 +1,4 @@
-package main
+package gosh
 
 const GoshName = "gosh"
 const GoshVersion = "v0.0.1"
