@@ -4,6 +4,7 @@ import (
 	"container/list"
 	"gosh/util"
 	"strconv"
+	"strings"
 	"unicode/utf8"
 
 	"github.com/scrouthtv/termios"
@@ -15,6 +16,8 @@ type Prompt struct {
 	parent *Gosh
 	style  PromptStyle
 	pos    *list.Element // points to the element to the left of the cursor
+	last   []string
+	lastY  int
 }
 
 // PromptStyle are individual styles for the prompt.
@@ -34,7 +37,7 @@ type PromptStyle interface {
 
 // NewPrompt creates a new prompt with the SimplePromptStyle style.
 func NewPrompt(parent *Gosh) *Prompt {
-	return &Prompt{list.New(), parent, &SimplePromptStyle{}, nil}
+	return &Prompt{list.New(), parent, &SimplePromptStyle{}, nil, nil, 0}
 }
 
 func (p *Prompt) doBackspace() {
@@ -90,31 +93,81 @@ func (p *Prompt) OnKey(key termios.Key) {
 	p.redraw()
 }
 
-func (p *Prompt) redraw() {
-	p.parent.WriteString("\033[0G") // move to column 0
-	p.parent.WriteString("\033[0J") // clear to end of screen, TODO: replace with termios.Action
+// lines returns
+//  - the lines that should be drawn
+//  - the x & y cursor position from the top left
+func (p *Prompt) lines() ([]string, int, int) {
+	var lines []string
+
+	var width int = int(p.parent.term.GetSize().Width)
+
+	var line strings.Builder
 
 	var leftPrompt string = p.style.LeftPrompt(p.parent, 0)
-	p.parent.WriteString(leftPrompt)
-
-	var line string = util.RuneListToString(p.line)
-	var pos int = util.PositionInList(p.line, p.pos)
-	// theoretically this could be done in a single loop, but I don't want to
-	if pos == -1 && p.line.Len() > 0 {
-		pos = 0
-	}
-
-	p.parent.WriteString(line)
+	line.WriteString(leftPrompt)
+	line.WriteString(util.RuneListToString(p.line))
 
 	var rightPrompt string = p.style.RightPrompt(p.parent, 0)
-	var width uint16 = p.parent.term.GetSize().Width
-	if width == 0 {
-		width = 80
-	}
-	var position int = int(width) - utf8.RuneCountInString(rightPrompt)
-	p.parent.WriteString("\033[" + strconv.Itoa(position) + "G") // move to column 50, TODO move it so the text is printed to the right border
-	p.parent.WriteString(rightPrompt)
+	var spaces int = width - line.Len() - utf8.RuneCountInString(rightPrompt)
 
-	position = utf8.RuneCountInString(leftPrompt) + pos + 2
-	p.parent.WriteString("\033[" + strconv.Itoa(position) + "G") // set cursor position
+	for i := 0; i < spaces; i++ {
+		line.WriteString(" ")
+	}
+
+	line.WriteString(rightPrompt)
+
+	lines = append(lines, line.String())
+
+	var xPos int = util.PositionInList(p.line, p.pos)
+	if xPos == -1 && p.line.Len() > 0 {
+		xPos = 0
+	}
+	xPos += utf8.RuneCountInString(leftPrompt) + 1
+
+	return lines, xPos, 0
+}
+
+func (p *Prompt) redraw() {
+	if p.lastY < 1 {
+		p.parent.WriteString("\r") // move to the beginning of this line
+	} else {
+		p.parent.WriteString("\r\x1b[" + strconv.Itoa(p.lastY-1) + "A") // move to the beginning n lines up
+	}
+
+	var lines []string
+	var xPos, yPos int
+	lines, xPos, yPos = p.lines()
+
+	var end1 int = len(lines)
+	if len(p.last) < end1 {
+		end1 = len(p.last)
+	}
+
+	var i int
+	for i = 0; i < end1; i++ {
+		if lines[i] != p.last[i] {
+			p.parent.WriteString(lines[i])
+		}
+		p.parent.WriteString("\r\n")
+	}
+
+	// draw all added lines:
+	for ; i < len(lines); i++ {
+		p.parent.WriteString(lines[i])
+		p.parent.WriteString("\r\n")
+	}
+
+	// place the cursor:
+	var up int = len(lines) - yPos
+	if up > 0 {
+		p.parent.WriteString("\x1b[" + strconv.Itoa(up) + "A") // up
+	}
+	p.parent.WriteString("\r\x1b[" + strconv.Itoa(xPos) + "C")
+
+	if false {
+		panic(xPos)
+	}
+
+	p.last = lines
+	p.lastY = yPos
 }
