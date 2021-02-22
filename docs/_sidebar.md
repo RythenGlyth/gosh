@@ -1,7 +1,8 @@
 * INTRODUCTION
   * [Overview](README.md)
   * [Installation](INSTALLATION.md)
-* CUSTOMIZATION
+* [Customization](customization/CUSTOMIZATION.md)
+  * [Prompt](customization/PROMPT.md)
 * [GOSHScript](goshscript/GOSHSCRIPT.md)
   * [Variables](goshscript/VARIABLES.md)
   * [Strings](goshscript/STRINGS.md)
