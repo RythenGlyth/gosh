@@ -8,20 +8,11 @@ import (
 func TestBasicListGet(t *testing.T) {
 
 	l := list.New()
-
-	l.PushBack("a")
-	l.PushBack("b")
-	l.PushBack("c")
-	l.PushBack("d")
-	l.PushBack("e")
-	l.PushBack("f")
-	l.PushBack("g")
-	l.PushBack("h")
-	l.PushBack("i")
-	l.PushBack("j")
-	l.PushBack("k")
-
 	arr := []string{"a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k"}
+
+	for _, s := range arr {
+		l.PushBack(s)
+	}
 
 	for i, s := range arr {
 		isE := ListGet(l, i)
