@@ -76,6 +76,8 @@ func (p *Prompt) OnKey(key termios.Key) {
 
 			p.pos = nil
 			p.line = list.New()
+			p.last = nil
+			p.lastY = 0
 			p.parent.WriteString("\r\n")
 
 			p.parent.Eval(line)
@@ -128,6 +130,9 @@ func (p *Prompt) lines() ([]string, int, int) {
 }
 
 func (p *Prompt) redraw() {
+	// hack time: hide the cursor while redrawing:
+	p.parent.WriteString("\x1b[?25l")
+
 	if p.lastY < 1 {
 		p.parent.WriteString("\r") // move to the beginning of this line
 	} else {
@@ -164,9 +169,7 @@ func (p *Prompt) redraw() {
 	}
 	p.parent.WriteString("\r\x1b[" + strconv.Itoa(xPos) + "C")
 
-	if false {
-		panic(xPos)
-	}
+	p.parent.WriteString("\x1b[?25h")
 
 	p.last = lines
 	p.lastY = yPos

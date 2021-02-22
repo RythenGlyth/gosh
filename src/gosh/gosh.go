@@ -104,7 +104,7 @@ func (g *Gosh) Interactive() (int, error) {
 // Eval evaluates the specified statement in the current namespace
 func (g *Gosh) Eval(line string) {
 	var parts []string = strings.Split(line, " ")
-	if len(parts) == 0 {
+	if len(parts) == 0 || parts[0] == "" {
 		return
 	}
 
