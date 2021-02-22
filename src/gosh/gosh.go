@@ -1,16 +1,20 @@
 package gosh
 
-import "os"
-import "fmt"
+import (
+	"fmt"
+	"os"
 
-import "github.com/scrouthtv/termios"
+	"github.com/scrouthtv/termios"
+)
 
+// Gosh type collects all modules of a gosh shell.
 type Gosh struct {
 	term   termios.Terminal
 	prompt *Prompt
 	ready  bool
 }
 
+// NewGosh creates a new, empty gosh.
 func NewGosh() *Gosh {
 	return &Gosh{nil, nil, false}
 }
@@ -44,7 +48,7 @@ func (g *Gosh) Close() {
 	}
 }
 
-var keyCd termios.Key = termios.Key{termios.KeyLetter, termios.ModCtrl, 'd'}
+var keyCd termios.Key = termios.Key{Type: termios.KeyLetter, Mod: termios.ModCtrl, Value: 'd'}
 
 // Interactive sets this gosh's mode to interactive.
 // User input is read from the underlying terminal
@@ -94,6 +98,7 @@ func (g *Gosh) Write(p []byte) (int, error) {
 	return g.term.Write(p)
 }
 
+// WriteString writes the specified string to the gosh's terminal
 func (g *Gosh) WriteString(s string) (int, error) {
 	return g.term.WriteString(s)
 }

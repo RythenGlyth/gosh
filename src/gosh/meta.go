@@ -1,8 +1,15 @@
 package gosh
 
+// GoshName is the shells name, defaulting to "gosh"
 const GoshName = "gosh"
+
+// GoshVersion is the gosh's rolling version number
+// The GoshVersion number should be equal to the tag
+// version in the Git repository
 const GoshVersion = "v0.0.1"
 
+// GoshLicense contains basic information about this
+// shell's license. It defaults to the MIT license.
 const GoshLicense = `MIT License
 
 Copyright (c) 2021 RythenGlyth, ScrouthTV
