@@ -225,8 +225,8 @@ func (lex *Lexer) nextPos() {
 	}
 }
 
-func (lex *Lexer) readNumber(radix int) (int, *LexError) {
-	var currentVal int
+func (lex *Lexer) readNumber(radix float64) (float64, *LexError) {
+	var currentVal float64
 loop:
 	for {
 		if lex.position+1 >= lex.length {
@@ -234,7 +234,7 @@ loop:
 		}
 		if lex.buffer[lex.position+1] == '.' {
 			lex.next()
-			var decVal int
+			var decVal float64
 		decLoop:
 			for {
 				var thisVal = getNumberValue(lex.buffer[lex.position+1])
@@ -247,10 +247,11 @@ loop:
 			currentVal += decVal
 			break loop
 		} else {
+			currentVal *= radix
 			var thisVal = getNumberValue(lex.buffer[lex.position+1])
-			if thisVal > 0 && thisVal < radix {
+			fmt.Print("_" + string(lex.buffer[lex.position+1]) + "_" + fmt.Sprint(thisVal) + ": " + fmt.Sprint(thisVal) + "\n")
+			if thisVal >= 0 && thisVal < radix {
 				currentVal += thisVal
-				currentVal *= radix
 				lex.next()
 			} else {
 				break loop
@@ -260,15 +261,15 @@ loop:
 	return currentVal, nil
 }
 
-func getNumberValue(char rune) int {
+func getNumberValue(char rune) float64 {
 	if char >= '0' && char <= '9' {
-		return (int)(char - '0')
+		return (float64)(char - '0')
 	}
 	if char >= 'A' && char <= 'Z' {
-		return (int)(char - 'A' + 10)
+		return (float64)(char - 'A' + 10)
 	}
 	if char >= 'a' && char <= 'z' {
-		return (int)(char - 'a' + 10)
+		return (float64)(char - 'a' + 10)
 	}
 	return -1
 }
