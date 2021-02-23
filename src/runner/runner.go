@@ -25,6 +25,7 @@ func Init() (*Runner, error) {
 	var px sync.RWMutex
 
 	envPath, ok = os.LookupEnv("PATH")
+
 	if !ok {
 		return nil, ErrNoEnvPath
 	}
@@ -35,6 +36,7 @@ func Init() (*Runner, error) {
 		wg.Add(1)
 		go r.hashFolder(folder, &wg, &px)
 	}
+
 	wg.Wait()
 
 	return &r, nil
