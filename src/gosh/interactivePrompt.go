@@ -2,7 +2,7 @@ package gosh
 
 import (
 	"container/list"
-	"gosh/util"
+	"src/util"
 	"strconv"
 	"strings"
 	"unicode/utf8"

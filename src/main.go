@@ -4,8 +4,8 @@ import (
 	"log"
 	"os"
 
-	"gosh/debug"
-	"gosh/gosh"
+	"src/debug"
+	"src/gosh"
 )
 
 var myGosh *gosh.Gosh

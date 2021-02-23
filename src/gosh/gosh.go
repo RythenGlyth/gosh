@@ -7,7 +7,7 @@ import (
 	"os/exec"
 	"strings"
 
-	"gosh/debug"
+	"src/debug"
 
 	"github.com/scrouthtv/termios"
 )
