@@ -8,33 +8,36 @@ import (
 	"gosh/src/gosh"
 )
 
-var myGosh *gosh.Gosh
-
 func main() {
 
-	myGosh = gosh.NewGosh()
-	myGosh.Init()
+	myGosh := gosh.NewGosh()
+	err := myGosh.Init()
+
+	if err != nil {
+		log.Println(err)
+		os.Exit(1)
+	}
 
 	if len(os.Args) > 1 {
 		if os.Args[1] == "start-debug" {
 			debug.StartDebugServer()
 			return
 		} else if os.Args[1] == "debug" {
-			debug, err := debug.NewClient()
+			dc, err := debug.NewClient()
 			if err != nil {
 				log.Println(err)
 				return
 			}
-			myGosh.SetDebugClient(debug)
+			myGosh.SetDebugClient(dc)
 		} else if os.Args[1] == "plugin" {
-			debug, err := debug.NewClient()
+			ds, err := debug.NewClient()
 			if err != nil {
 				log.Println(err)
 				return
 			}
-			myGosh.SetDebugClient(debug)
+			myGosh.SetDebugClient(ds)
 
-			debug.SendMessage(1, "Loading example-mod.so")
+			ds.SendMessage(1, "Loading example-mod.so")
 			myGosh.LoadPlugin("/home/lenni/example-mod.so")
 		}
 	}
