@@ -10,17 +10,21 @@ import (
 	"unicode"
 )
 
-// Lexer (Tokenizer)
+// Lexer (Tokenizer) is created from an input (slice of runes) and separates it into tokens
+// by callintg the Lex() function.
 type Lexer struct {
 	//buffer containing the character of the code to analyze
 	buffer []rune
+
 	//character inden in buffer
 	position int
 
 	codeXPos int
 	codeYPos int
+
 	//length of the content in the buffer
 	length int
+
 	//if the last character was a backslash. used to handle escaped codes
 	wasBackslash bool
 

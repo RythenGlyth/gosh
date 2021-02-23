@@ -1,8 +1,6 @@
 package lexer
 
-//lint:file-ignore U1000 lexer tokens will be used at some point
-
-// TokenType is
+// TokenType is a type of token
 type TokenType string
 
 const (
