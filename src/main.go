@@ -34,11 +34,11 @@ func main() {
 			}
 			myGosh.SetDebugClient(debug)
 
+			debug.SendMessage(1, "Loading example-mod.so")
 			myGosh.LoadPlugin("/home/lenni/example-mod.so")
 		}
 	}
 
-	myGosh.SendKey("asdf")
 	retcode, err := myGosh.Interactive()
 	if err != nil {
 		os.Stdout.WriteString(err.Error())

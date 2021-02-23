@@ -8,3 +8,9 @@ require (
 	github.com/RythenGlyth/gosh/src/util v0.0.0-20210223100923-dfed2345dc39 // indirect
 	golang.org/x/sys v0.0.0-20210223085322-b80eb88b80d2 // indirect
 )
+
+replace (
+	github.com/RythenGlyth/gosh/src/gosh => ./gosh
+	github.com/RythenGlyth/gosh/src/debug => ./debug
+	github.com/RythenGlyth/gosh/src/util => ./util
+)

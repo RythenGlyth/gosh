@@ -1,6 +1,7 @@
 package gosh
 
 import (
+	"github.com/scrouthtv/termios"
 	"plugin"
 )
 
@@ -8,7 +9,7 @@ import (
 // It is capable of loading new plugins from a specified path using the Load() method,
 // as well as sending an event to all registered plugins
 type Handler struct {
-	keyListener []func(s string) bool
+	keyListener []func(g *Gosh, k *termios.Key) bool
 	parent      *Gosh
 }
 
@@ -25,6 +26,7 @@ func (h *Handler) Load(path string) error {
 	p, err := plugin.Open(path)
 
 	if err != nil {
+		h.parent.DebugMessage(2, "Error loading plugin: "+err.Error())
 		return err
 	}
 
@@ -42,16 +44,20 @@ func (h *Handler) Load(path string) error {
 // OnKey sends the event to all plugins and
 // returns false as soon as the first plugin returns false
 // or true if all loaded plugins returned true.
-func (h *Handler) OnKey(s string) bool {
+func (h *Handler) OnKey(k *termios.Key) bool {
 	var ok bool = true
 
+	h.parent.DebugMessage(2, "Sending key event to all plugins")
+
 	for _, f := range h.keyListener {
-		ok = f(s)
+		ok = f(h.parent, k)
 		if !ok {
+			h.parent.DebugMessage(2, "Going to return false")
 			return false
 		}
 	}
 
+	h.parent.DebugMessage(2, "Going to return true")
 	return true
 }
 
@@ -64,7 +70,7 @@ func (h *Handler) loadKeyListeners(p *plugin.Plugin) bool {
 		return false
 	}
 
-	f, ok := s.(func(s string) bool)
+	f, ok := s.(func(g *Gosh, k *termios.Key) bool)
 	if !ok {
 		h.parent.DebugMessage(2, "OnKey() has wrong signature or isn't a function")
 		return false

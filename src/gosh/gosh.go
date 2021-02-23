@@ -39,8 +39,8 @@ func (g *Gosh) LoadPlugin(s string) error {
 }
 
 // SendKey sends the specified key to all loaded plugins.
-func (g *Gosh) SendKey(s string) bool {
-	return g.plugin.OnKey(s)
+func (g *Gosh) SendKey(k *termios.Key) bool {
+	return g.plugin.OnKey(k)
 }
 
 // DebugMessage sends a message with the specified module identifier
@@ -117,6 +117,12 @@ func (g *Gosh) Interactive() (int, error) {
 			os.Stdout.WriteString(err.Error() + "\n")
 		} else {
 			for _, k = range in {
+
+				if !g.plugin.OnKey(&k) {
+					g.DebugMessage(1, "Skipping this key because a plugin skipped it")
+					continue
+				}
+
 				if k.Equal(&keyCd) { // C-d to quit
 					return 0, nil
 				}
