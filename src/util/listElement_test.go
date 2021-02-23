@@ -6,7 +6,6 @@ import (
 )
 
 func TestBasicListGet(t *testing.T) {
-
 	l := list.New()
 	arr := []string{"a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k"}
 
@@ -34,7 +33,6 @@ func TestBasicListGet(t *testing.T) {
 }
 
 func TestRuneListToString(t *testing.T) {
-
 	arr := []rune{'o', 'm', 'e', 'g', 'a', 'l', 'u', 'l'}
 	l := list.New()
 
@@ -81,5 +79,4 @@ func TestPositionInList(t *testing.T) {
 	if pos != 2 {
 		t.Errorf("Wrong position for element 2: %d", pos)
 	}
-
 }

@@ -16,14 +16,14 @@ func ListGet(l *list.List, index int) *list.Element {
 
 	if index <= l.Len()/2 {
 		e = l.Front()
-		var i int
-		for i = 0; i < index; i++ {
+
+		for i := 0; i < index; i++ {
 			e = e.Next()
 		}
 	} else {
 		e = l.Back()
-		var i int
-		for i = 1; i < l.Len()-index; i++ {
+
+		for i := 1; i < l.Len()-index; i++ {
 			e = e.Prev()
 		}
 	}
@@ -41,7 +41,7 @@ func RuneListToString(l *list.List) string {
 
 	var line strings.Builder
 
-	var e *list.Element = l.Front()
+	e := l.Front()
 
 	for e != l.Back() {
 		line.WriteRune(e.Value.(rune))
@@ -59,16 +59,20 @@ func PositionInList(l *list.List, elem *list.Element) int {
 		return -1
 	}
 
-	var i int = 0
-	var e *list.Element = l.Front()
+	var i int
+
+	e := l.Front()
 
 	for e != l.Back() {
 		if e == elem {
 			return i
 		}
+
 		i++
+
 		e = e.Next()
 	}
+
 	if e == elem {
 		return i
 	}
