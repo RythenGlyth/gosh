@@ -22,9 +22,46 @@ func TestLexer(t *testing.T) {
 	lex = NewLexer(runArr, len(runArr), "../test/test.gosh")
 	tokens, lerr := lex.Lex()
 	if lerr != nil {
-		log.Fatal(lerr.SPrint())
+		log.Fatal(lerr.Error())
 	}
 	t.Logf("\n%v\n", *tokens)
+}
 
-	t.Logf("%v", getNumberValue('a'))
+func TestUnknownToken(t *testing.T) {
+	buf, err := ioutil.ReadFile("../test/unknownToken.gosh")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	contents := []rune(string(buf))
+	lex := NewLexer(contents, len(contents), "../test/unknownToken.gosh")
+	_, lerr := lex.Lex()
+
+	_, ok := lerr.(*UnknownTokenError)
+
+	t.Log(lerr.Error())
+
+	if !ok {
+		t.Fatal("Expected an unkown error token, got", lerr.Error(), "instead")
+	}
+}
+
+func TestMissingQuote(t *testing.T) {
+	buf, err := ioutil.ReadFile("../test/missingQuote.gosh")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	contents := []rune(string(buf))
+
+	lex := NewLexer(contents, len(contents), "../test/missingQuote.gosh")
+	_, lerr := lex.Lex()
+
+	_, ok := lerr.(*MissingQuoteError)
+
+	t.Log(lerr.Error())
+
+	if !ok {
+		t.Fatal("Expected a missing quote error, got", lerr.Error(), "instead")
+	}
 }

@@ -2,9 +2,7 @@ package lexer
 
 import (
 	"encoding/hex"
-	"errors"
 	"fmt"
-	"math"
 	"strconv"
 	"strings"
 	"unicode"
@@ -13,6 +11,7 @@ import (
 // Lexer (Tokenizer) is created from an input (slice of runes) and separates it into tokens
 // by callintg the Lex() function.
 type Lexer struct {
+
 	//buffer containing the character of the code to analyze
 	buffer []rune
 
@@ -35,11 +34,11 @@ type Lexer struct {
 
 // NewLexer creates a new Lexer
 func NewLexer(source []rune, length int, inputName string) *Lexer {
-	return &Lexer{source, -1, 1, 1, length, false, inputName, '\x00'}
+	return &Lexer{source, -1, 0, 1, length, false, inputName, '\x00'}
 }
 
 // Lex into tokens
-func (lex *Lexer) Lex() (*[]Token, *LexError) {
+func (lex *Lexer) Lex() (*[]Token, LexError) {
 	var tokens []Token
 	lex.next()
 	for lex.position < lex.length {
@@ -54,7 +53,7 @@ func (lex *Lexer) Lex() (*[]Token, *LexError) {
 	return &tokens, nil
 }
 
-func (lex *Lexer) nextToken() (*Token, *LexError) {
+func (lex *Lexer) nextToken() (*Token, LexError) {
 	var startPos int = lex.position
 	var tokenType TokenType = ttEmpty
 	var valueBuilder strings.Builder
@@ -83,7 +82,7 @@ loop:
 					valueBuilder.WriteRune(lex.character)
 					lex.next()
 				} else {
-					return nil, &LexError{errors.New("missing closing quotes of string"), lex.codeXPos, lex.codeYPos, lex.position, lex}
+					return nil, &MissingQuoteError{Position{lex.codeXPos + 1, lex.codeYPos, lex.position + 1, lex}}
 				}
 			}
 			tokenType = ttString
@@ -145,7 +144,7 @@ loop:
 					lex.next()
 					radix, err := strconv.ParseFloat(numStringBuilder.String(), 10)
 					if err != nil {
-						return nil, &LexError{errors.New("Wrong format (it should be 0rnn:hh...) "), lex.codeXPos, lex.codeYPos, lex.position, lex}
+						return nil, &NumberFormatError{Position{lex.codeXPos, lex.codeYPos, lex.position, lex}}
 					}
 					val, err2 := lex.readNumber(radix)
 					if err2 != nil {
@@ -166,7 +165,7 @@ loop:
 			valueBuilder.WriteString(fmt.Sprint(val))
 			break loop
 		default:
-			return nil, &LexError{errors.New("unknown token"), lex.codeXPos, lex.codeYPos, lex.position, lex}
+			return nil, &UnknownTokenError{Position{lex.codeXPos, lex.codeYPos, lex.position, lex}}
 			//fmt.Print("sas")
 		}
 	}
@@ -175,20 +174,19 @@ loop:
 	return &Token{tokenType, startPos, endpos, valueBuilder.String()}, nil
 }
 
-func (lex *Lexer) next() *LexError {
+func (lex *Lexer) next() LexError {
 	return lex.nextB(false)
 }
 
-func (lex *Lexer) nextB(wasBackslash bool) *LexError {
+func (lex *Lexer) nextB(wasBackslash bool) LexError {
 	lex.wasBackslash = wasBackslash
 	lex.nextPos()
 	if lex.position >= 0 && lex.position < lex.length && lex.buffer[lex.position] == '\\' && !lex.wasBackslash {
 		lex.wasBackslash = true
 		if lex.position+1 < lex.length {
 			return lex.nextB(true)
-		} else {
-			return &LexError{errors.New("nothing to escape"), lex.codeXPos, lex.codeYPos, lex.position, lex}
 		}
+		return &TrailingBackslashError{Position{lex.codeXPos, lex.codeYPos, lex.position, lex}}
 	}
 	if lex.position >= 0 && lex.position < lex.length {
 		if lex.wasBackslash {
@@ -212,23 +210,14 @@ func (lex *Lexer) nextB(wasBackslash bool) *LexError {
 			case '"':
 				lex.character = '"'
 			case 'x', 'u', 'U':
-				var hexStringBuilder strings.Builder
-				hexStringBuilder.WriteRune(lex.buffer[lex.position+1])
 				lex.nextPos()
-				for unicode.Is(unicode.Hex_Digit, lex.buffer[lex.position+1]) {
-					hexStringBuilder.WriteRune(lex.buffer[lex.position+1])
-					lex.nextPos()
-				}
-				var err error
-				var decoded int64
-				hexString := hexStringBuilder.String()
-				decoded, err = strconv.ParseInt(hexString, 16, 64)
+				val, err := lex.readNumber(16)
 				if err != nil {
-					return &LexError{errors.New("can't decode " + hexString + " in hex format"), lex.codeXPos, lex.codeYPos, lex.position, lex}
+					return err
 				}
-				lex.character = rune(decoded)
+				lex.character = rune(val)
 			default:
-				return &LexError{errors.New("can't escape " + string(lex.buffer[lex.position])), lex.codeXPos, lex.codeYPos, lex.position, lex}
+				return &InvalidEscapeCharacterError{Position{lex.codeXPos, lex.codeYPos, lex.position, lex}, lex.buffer[lex.position]}
 			}
 		} else {
 			lex.character = lex.buffer[lex.position]
@@ -246,7 +235,7 @@ func (lex *Lexer) nextPos() {
 	}
 }
 
-func (lex *Lexer) readNumber(radix float64) (float64, *LexError) {
+func (lex *Lexer) readNumber(radix float64) (float64, LexError) {
 	var currentVal float64
 loop:
 	for {
@@ -293,20 +282,6 @@ func getNumberValue(char rune) float64 {
 		return (float64)(char - 'a' + 10)
 	}
 	return -1
-}
-
-//LexError is the type of error thrown by the lexer
-type LexError struct {
-	err      error
-	codeXPos int
-	codeYPos int
-	bufPos   int
-	lexer    *Lexer
-}
-
-//SPrint s the lexer error into a string
-func (lexErr *LexError) SPrint() string {
-	return ("Error while Lexing:" + "\n" + lexErr.lexer.inputName + ":" + fmt.Sprint(lexErr.codeYPos) + ":" + fmt.Sprint(lexErr.codeXPos) + ": " + lexErr.err.Error() + "\n" + string(lexErr.lexer.buffer[int(math.Max(float64(lexErr.bufPos-10), float64(0))):int(math.Min(float64(lexErr.bufPos+10), float64(lexErr.lexer.length-1)))]) + "\n" + strings.Repeat(" ", (lexErr.bufPos-int(math.Max(float64(lexErr.bufPos-10), float64(0))))) + "^")
 }
 
 //BinaryRangeTable is a set of 0 and 1
