@@ -2,16 +2,17 @@ package gosh
 
 import (
 	"fmt"
+	"gosh/src/debug"
+	"gosh/src/shared"
 	"io"
 	"os"
 	"os/exec"
 	"strings"
 
-	"gosh/src/debug"
-	"gosh/src/shared"
-
 	"github.com/scrouthtv/termios"
 )
+
+var keyCd termios.Key = termios.Key{Type: termios.KeyLetter, Mod: termios.ModCtrl, Value: 'd'}
 
 // Gosh type collects all modules of a gosh shell.
 type Gosh struct {
@@ -20,6 +21,19 @@ type Gosh struct {
 	ready  bool
 	debug  *debug.Client
 	plugin *Handler
+}
+
+// InitError is an error that occurred during initialization of the gosh.
+type InitError struct {
+	err error
+}
+
+func (e *InitError) Unwrap() error {
+	return e.err
+}
+
+func (e *InitError) Error() string {
+	return "error initializing gosh: " + e.err.Error()
 }
 
 // NewGosh creates a new, empty gosh but does not start it yet.
@@ -56,10 +70,12 @@ func (g *Gosh) DebugMessage(k int, msg string) {
 func (g *Gosh) Init() error {
 	var err error
 	var term termios.Terminal
+
 	term, err = termios.Open()
 	if err != nil {
-		return err
+		return &InitError{err}
 	}
+
 	g.term = term
 
 	g.prompt = NewPrompt(g)
@@ -81,8 +97,6 @@ func (g *Gosh) Close() {
 	}
 }
 
-var keyCd termios.Key = termios.Key{Type: termios.KeyLetter, Mod: termios.ModCtrl, Value: 'd'}
-
 // Interactive sets this gosh's mode to interactive.
 // User input is read from the underlying terminal
 // and commands are executed in the current namespace.
@@ -96,6 +110,7 @@ func (g *Gosh) Interactive() (int, error) {
 			os.Stdout.WriteString("Error occurred during intialization:")
 			os.Stdout.WriteString(err.Error())
 			os.Stdout.WriteString("\n")
+
 			return 1, err
 		}
 		defer g.Close()
@@ -112,13 +127,13 @@ func (g *Gosh) Interactive() (int, error) {
 		g.term.SetRaw(true)
 		in, err = g.term.Read()
 		g.term.SetRaw(false)
+
 		if err != nil {
 			// Consider g.term broken:
 			os.Stdout.WriteString("Error reading input:\n")
 			os.Stdout.WriteString(err.Error() + "\n")
 		} else {
 			for _, k = range in {
-
 				if k.Equal(&keyCd) { // C-d to quit
 					return 0, nil
 				}
@@ -142,7 +157,7 @@ func (g *Gosh) Interactive() (int, error) {
 
 // Eval evaluates the specified statement in the current namespace.
 func (g *Gosh) Eval(line string) {
-	var parts []string = strings.Split(line, " ")
+	parts := strings.Split(line, " ")
 	if len(parts) == 0 || parts[0] == "" {
 		return
 	}
@@ -153,6 +168,7 @@ func (g *Gosh) Eval(line string) {
 		g.Close()
 	case "cd":
 		var err error
+
 		if len(parts) == 1 {
 			home, _ := os.UserHomeDir() //nolint errcheck // This will get implemented later in conjunction with the parser
 			err = g.changeWD(home)
@@ -166,7 +182,7 @@ func (g *Gosh) Eval(line string) {
 			g.WriteString("\r\n")
 		}
 	case "gst":
-		var cmd *exec.Cmd = exec.Command("git", "status")
+		cmd := exec.Command("git", "status")
 
 		inPipe, inErr := cmd.StdinPipe()
 		outPipe, outErr := cmd.StdoutPipe()
@@ -197,13 +213,14 @@ func (g *Gosh) changeWD(target string) error {
 	return os.Chdir(target)
 }
 
-// GetWD returns a string representation of the current working directory
-// or ~ if any error occurred (e. g. the directory was deleted).
+// GetWD returns a string representation of the current working directory.
+// ~ is returned if any error occurred (e. g. the directory was deleted).
 func (g *Gosh) GetWD() string {
 	wd, err := os.Getwd()
 	if err != nil {
 		return "~"
 	}
+
 	return wd
 }
 
@@ -211,7 +228,7 @@ func (g *Gosh) Write(p []byte) (int, error) {
 	return g.term.Write(p)
 }
 
-// WriteString writes the specified string to the gosh's terminal
+// WriteString writes the specified string to the gosh's terminal.
 func (g *Gosh) WriteString(s string) (int, error) {
 	return g.term.WriteString(s)
 }

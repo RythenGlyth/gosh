@@ -3,9 +3,8 @@ package gosh
 import (
 	"plugin"
 
-	"gosh/src/shared"
-
 	"github.com/scrouthtv/termios"
+	"gosh/src/shared"
 )
 
 // Handler handles all event-based plugins.
@@ -40,7 +39,6 @@ func (l *LoaderError) Error() string {
 // It returns an error if the file could not be found.
 func (h *Handler) Load(path string) error {
 	p, err := plugin.Open(path)
-
 	if err != nil {
 		h.parent.DebugMessage(shared.ModPluginLoader, "Error loading plugin: "+err.Error())
 		return &LoaderError{err}
@@ -76,7 +74,6 @@ func (h *Handler) OnKey(k *termios.Key) bool {
 
 func (h *Handler) loadKeyListeners(p *plugin.Plugin) bool {
 	s, err := p.Lookup("OnKey")
-
 	if err != nil {
 		// OnKey() does not exist
 		h.parent.DebugMessage(shared.ModPluginLoader, "Couldn't find the OnKey() method")
