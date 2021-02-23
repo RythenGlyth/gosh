@@ -25,8 +25,16 @@ func NewGosh() *Gosh {
 	return &Gosh{nil, nil, false, nil}
 }
 
+// SetDebugClient attaches the specified debugging client to
+// the gosh instance.
 func (g *Gosh) SetDebugClient(c *debug.Client) {
 	g.debug = c
+}
+
+// DebugMessage sends a message with the specified module identifier
+// and contents to the debug server.
+func (g *Gosh) DebugMessage(k int, msg string) {
+	g.debug.SendMessage(k, msg)
 }
 
 // Init prepares all sub-functionality of this gosh instance.
@@ -81,12 +89,11 @@ func (g *Gosh) Interactive() (int, error) {
 	var in []termios.Key
 	var k termios.Key
 
-	g.debug.SendMessage(1, "Going interactive")
+	g.DebugMessage(1, "Going interactive")
 	g.term.Write([]byte(fmt.Sprintf("This is %s %s. Press C-d to exit.\r\n", GoshName, GoshVersion)))
 	g.prompt.redraw()
 
 	for {
-		g.debug.SendMessage(1, "Event loop")
 		g.term.SetRaw(true)
 		in, err = g.term.Read()
 		g.term.SetRaw(false)
