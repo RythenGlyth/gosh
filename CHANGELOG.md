@@ -12,8 +12,8 @@ Current features are:
     * Ability to send arbitrary debugging messages to a second window
  - GoshScript
     * Basic Lexer implementation for reading goshscript files
-    * Lexer parses numbers of any radix from 2 to 34
-    * Lexer parses escape sequences (read documentation)
+    * Lexer parses numbers of any radix from 2 to 36
+    * Lexer parses escape sequences (see [Escape codes](goshscript/STRINGS?id=escape-codes))
  - Plugin
     * Plugins are event-driven, every plugin will be able to implement different functions that will be called by the EventHandler
  - Documentation
