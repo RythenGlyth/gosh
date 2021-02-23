@@ -136,6 +136,23 @@ loop:
 					break loop
 				//0rn:hhh... (number with specific radix) n=radix (between 2 and 36), h=number itself
 				case 'r', 'R':
+					lex.next()
+					var numStringBuilder strings.Builder
+					for lex.position+1 < lex.length && lex.buffer[lex.position+1] != ':' {
+						lex.next()
+						numStringBuilder.WriteRune(lex.character)
+					}
+					lex.next()
+					radix, err := strconv.ParseFloat(numStringBuilder.String(), 10)
+					if err != nil {
+						return nil, &LexError{errors.New("Wrong format (it should be 0rnn:hh...) "), lex.codeXPos, lex.codeYPos, lex.position, lex}
+					}
+					val, err2 := lex.readNumber(radix)
+					if err2 != nil {
+						return nil, err2
+					}
+					tokenType = ttNumber
+					valueBuilder.WriteString(fmt.Sprint(val))
 					break loop
 				}
 			}
@@ -296,5 +313,12 @@ func (lexErr *LexError) SPrint() string {
 var BinaryRangeTable = &unicode.RangeTable{
 	R16: []unicode.Range16{
 		{0x0030, 0x0031, 1},
+	},
+}
+
+//DecimalRangeTable is a set of all decimals
+var DecimalRangeTable = &unicode.RangeTable{
+	R16: []unicode.Range16{
+		{'0', '9', 1},
 	},
 }
