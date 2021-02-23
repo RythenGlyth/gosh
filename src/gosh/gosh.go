@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"gosh/src/debug"
+	"gosh/src/shared"
 
 	"github.com/scrouthtv/termios"
 )
@@ -92,7 +93,7 @@ func (g *Gosh) Interactive() (int, error) {
 	if !g.ready {
 		err = g.Init()
 		if err != nil {
-			os.Stdout.WriteString("Error occured during intialization:")
+			os.Stdout.WriteString("Error occurred during intialization:")
 			os.Stdout.WriteString(err.Error())
 			os.Stdout.WriteString("\n")
 			return 1, err
@@ -103,8 +104,8 @@ func (g *Gosh) Interactive() (int, error) {
 	var in []termios.Key
 	var k termios.Key
 
-	g.DebugMessage(1, "Going interactive")
-	g.term.Write([]byte(fmt.Sprintf("This is %s %s. Press C-d to exit.\r\n", GoshName, GoshVersion)))
+	g.DebugMessage(shared.ModMain, "Going interactive")
+	g.term.Write([]byte(fmt.Sprintf("This is %s %s. Press C-d to exit.\r\n", shared.GoshName, shared.GoshVersion)))
 	g.prompt.redraw()
 
 	for {
@@ -123,12 +124,10 @@ func (g *Gosh) Interactive() (int, error) {
 				}
 
 				if !g.plugin.OnKey(&k) {
-					g.DebugMessage(1, "Skipping this key because a plugin skipped it")
+					g.DebugMessage(shared.ModMain, "Skipping this key because a plugin skipped it")
 					continue
 				}
 
-				// TODO event handling
-				//  -> plugin management
 				g.prompt.OnKey(k)
 
 				if !g.ready {
@@ -141,20 +140,21 @@ func (g *Gosh) Interactive() (int, error) {
 	}
 }
 
-// Eval evaluates the specified statement in the current namespace
+// Eval evaluates the specified statement in the current namespace.
 func (g *Gosh) Eval(line string) {
 	var parts []string = strings.Split(line, " ")
 	if len(parts) == 0 || parts[0] == "" {
 		return
 	}
 
-	if parts[0] == "exit" {
+	switch parts[0] {
+	case "exit":
 		g.WriteString("Goodbye.")
 		g.Close()
-	} else if parts[0] == "cd" {
+	case "cd":
 		var err error
 		if len(parts) == 1 {
-			home, _ := os.UserHomeDir()
+			home, _ := os.UserHomeDir() //nolint errcheck // This will get implemented later in conjunction with the parser
 			err = g.changeWD(home)
 		} else {
 			err = g.changeWD(parts[1])
@@ -165,7 +165,7 @@ func (g *Gosh) Eval(line string) {
 			g.WriteString(err.Error())
 			g.WriteString("\r\n")
 		}
-	} else if parts[0] == "gst" {
+	case "gst":
 		var cmd *exec.Cmd = exec.Command("git", "status")
 
 		inPipe, inErr := cmd.StdinPipe()
@@ -185,7 +185,7 @@ func (g *Gosh) Eval(line string) {
 
 		cmd.Start()
 		cmd.Wait()
-	} else {
+	default:
 		g.WriteString("Unknown command '")
 		g.WriteString(line)
 		g.WriteString("'")
@@ -198,7 +198,7 @@ func (g *Gosh) changeWD(target string) error {
 }
 
 // GetWD returns a string representation of the current working directory
-// or ~ if any error occured (e. g. the directory was deleted).
+// or ~ if any error occurred (e. g. the directory was deleted).
 func (g *Gosh) GetWD() string {
 	wd, err := os.Getwd()
 	if err != nil {

@@ -1,8 +1,11 @@
 package gosh
 
 import (
-	"github.com/scrouthtv/termios"
 	"plugin"
+
+	"gosh/src/shared"
+
+	"github.com/scrouthtv/termios"
 )
 
 // Handler handles all event-based plugins.
@@ -20,22 +23,35 @@ func NewHandler(g *Gosh) *Handler {
 	return &Handler{nil, g}
 }
 
+// LoaderError is returned if an error occured during plugin loading
+type LoaderError struct {
+	err error
+}
+
+func (l *LoaderError) Unwrap() error {
+	return l.err
+}
+
+func (l *LoaderError) Error() string {
+	return "error loading plugin: " + l.err.Error()
+}
+
 // Load loads a plugin (shared library) from the specified path.
 // It returns an error if the file could not be found.
 func (h *Handler) Load(path string) error {
 	p, err := plugin.Open(path)
 
 	if err != nil {
-		h.parent.DebugMessage(3, "Error loading plugin: "+err.Error())
-		return err
+		h.parent.DebugMessage(shared.ModPluginLoader, "Error loading plugin: "+err.Error())
+		return &LoaderError{err}
 	}
 
 	loaded := h.loadKeyListeners(p)
 
 	if loaded {
-		h.parent.DebugMessage(3, "Loaded a key listener")
+		h.parent.DebugMessage(shared.ModPluginLoader, "Loaded a key listener")
 	} else {
-		h.parent.DebugMessage(3, "Couldn't load a key listener")
+		h.parent.DebugMessage(shared.ModPluginLoader, "Couldn't load a key listener")
 	}
 
 	return nil
@@ -50,7 +66,7 @@ func (h *Handler) OnKey(k *termios.Key) bool {
 	for _, f := range h.keyListener {
 		ok = f(h.parent, k)
 		if !ok {
-			h.parent.DebugMessage(3, "Key event was cancelled by a plugin")
+			h.parent.DebugMessage(shared.ModPluginLoader, "Key event was cancelled by a plugin")
 			return false
 		}
 	}
@@ -63,18 +79,18 @@ func (h *Handler) loadKeyListeners(p *plugin.Plugin) bool {
 
 	if err != nil {
 		// OnKey() does not exist
-		h.parent.DebugMessage(3, "Couldn't find the OnKey() method")
+		h.parent.DebugMessage(shared.ModPluginLoader, "Couldn't find the OnKey() method")
 		return false
 	}
 
 	f, ok := s.(func(g *Gosh, k *termios.Key) bool)
 	if !ok {
-		h.parent.DebugMessage(3, "OnKey() has wrong signature or isn't a function")
+		h.parent.DebugMessage(shared.ModPluginLoader, "OnKey() has wrong signature or isn't a function")
 		return false
 	}
 
 	h.keyListener = append(h.keyListener, f)
 
-	h.parent.DebugMessage(2, "Succesfully loaded a key listener")
+	h.parent.DebugMessage(shared.ModPluginLoader, "Successfully loaded a key listener")
 	return true
 }

@@ -6,7 +6,7 @@ import (
 )
 
 // ListGet returns the index-th element from the specified list.
-// If the list does not contain enough elements, nil is returned
+// If the list does not contain enough elements, nil is returned.
 func ListGet(l *list.List, index int) *list.Element {
 	if l.Len() <= index {
 		return nil

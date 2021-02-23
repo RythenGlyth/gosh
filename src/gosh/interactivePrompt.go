@@ -6,9 +6,8 @@ import (
 	"strings"
 	"unicode/utf8"
 
-	"gosh/src/util"
-
 	"github.com/scrouthtv/termios"
+	"gosh/src/util"
 )
 
 // Prompt is responsible for drawing the UI of an interactive Gosh
@@ -102,16 +101,16 @@ func (p *Prompt) OnKey(key termios.Key) {
 func (p *Prompt) lines() ([]string, int, int) {
 	var lines []string
 
-	var width int = int(p.parent.term.GetSize().Width)
+	width := int(p.parent.term.GetSize().Width)
 
 	var line strings.Builder
 
-	var leftPrompt string = p.style.LeftPrompt(p.parent, 0)
+	leftPrompt := p.style.LeftPrompt(p.parent, 0)
 	line.WriteString(leftPrompt)
 	line.WriteString(util.RuneListToString(p.line))
 
-	var rightPrompt string = p.style.RightPrompt(p.parent, 0)
-	var spaces int = width - line.Len() - utf8.RuneCountInString(rightPrompt)
+	rightPrompt := p.style.RightPrompt(p.parent, 0)
+	spaces := width - line.Len() - utf8.RuneCountInString(rightPrompt)
 
 	for i := 0; i < spaces; i++ {
 		line.WriteString(" ")

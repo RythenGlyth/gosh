@@ -1,7 +1,7 @@
 package debug
 
 import (
-	"fmt"
+	"log"
 	"os"
 	"strconv"
 	"time"
@@ -9,12 +9,24 @@ import (
 	ipc "github.com/scrouthtv/golang-ipc"
 )
 
-// StartDebugServer starts a server that gosh instances can connect
-// to to send debugging messages
+// Client can send debugging data from the gosh client to a gosh-debug server.
+type Client struct {
+	cc        *ipc.Client
+	buf       chan *dMsg
+	isReading bool
+}
+
+type dMsg struct {
+	key int
+	msg string
+}
+
+// StartDebugServer starts a server that gosh instances can connect to
+// to send debugging messages.
 func StartDebugServer() {
 	sc, err := ipc.StartServer("goshdebug", nil)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return
 	}
 
@@ -22,34 +34,27 @@ func StartDebugServer() {
 	for run {
 		msg, err := sc.Read()
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 		} else if msg.MsgType > 0 {
 			var s string = string(msg.Data)
 			if s == "stop" {
-				fmt.Println("going to stop")
+				log.Println("going to stop")
 				run = false
 			} else {
-				fmt.Printf("%d: %s\n", msg.MsgType, string(msg.Data))
+				log.Printf("%d: %s\n", msg.MsgType, string(msg.Data))
 			}
 		}
 	}
-}
-
-// Client can be used to send debugging data from the gosh client to a gosh-debug server
-type Client struct {
-	cc        *ipc.Client
-	buf       chan *ipc.Message
-	isReading bool
 }
 
 // NewClient creates a new client and attaches it to a local gosh-debug server.
 func NewClient() (*Client, error) {
 	cc, err := ipc.StartClient("goshdebug", nil)
 	if err != nil {
-		return nil, err
+		return nil, &LaunchError{err}
 	}
 
-	var c *Client = &Client{cc, make(chan *ipc.Message, 8), false}
+	var c *Client = &Client{cc, make(chan *dMsg, 8), false}
 
 	go c.readLoop()
 	go c.writeLoop()
@@ -79,14 +84,15 @@ func (c *Client) writeLoop() {
 			os.Stdout.WriteString("\r\n\r\nCould not connect to ipc connect\r\n\r\n")
 			os.Exit(1)
 		}
+
 		time.Sleep(100 * time.Millisecond)
 		status = c.status()
 	}
 	c.cc.Write(1, []byte("Connected from pid "+strconv.Itoa(os.Getpid())))
-	var msg *ipc.Message
+	var msg *dMsg
 	for {
 		msg = <-c.buf
-		c.cc.Write(msg.MsgType, msg.Data)
+		c.cc.Write(msg.key, []byte(msg.msg))
 	}
 }
 
@@ -105,5 +111,5 @@ func (c *Client) SendMessage(k int, msg string) {
 	if c == nil || c.cc == nil {
 		return
 	}
-	c.buf <- &ipc.Message{MsgType: k, Data: []byte(msg)}
+	c.buf <- &dMsg{k, msg} //nolint exhaustivestruct the status part is set by the API
 }
