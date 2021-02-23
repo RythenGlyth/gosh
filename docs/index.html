@@ -20,7 +20,8 @@
       loadSidebar: true,
       fallbackLanguages: [''],
       alias: {
-          '.*?/CHANGELOG.md': 'https://raw.githubusercontent.com/RythenGlyth/gosh/main/CHANGELOG.md'
+          '.*?/CHANGELOG.md': 'https://raw.githubusercontent.com/RythenGlyth/gosh/main/CHANGELOG.md',
+          '.*?/TEST.md': 'https://raw.githubusercontent.com/wiki/adam-p/markdown-here/Markdown-Cheatsheet.md'
       },
       search: 'auto',
       themeColor: '#1e90df',
@@ -34,6 +35,11 @@
       },
       notFoundPage: '404.md',
       homepage: 'README.md',
+      progress: {
+        position: "top",
+        color: "var(--theme-color,#42b983)",
+        height: "3px",
+      },
       plugins: [
         (hook, vm) => {
           hook.ready(() => {
@@ -80,17 +86,24 @@
             lastHref = allHrefs[currIndex-1]
             nextHref = allHrefs[currIndex+1]
           }
+        },
+        (hook, vm) => {
+          hook.afterEach((html, next) => {
+            if(!vm.route.file.includes("http://") && !vm.route.file.includes("https://") )
+              html += '<hr/><footer><span><a target="_blank" href="https://github.com/RythenGlyth/gosh/tree/main/docs/' + vm.route.file + '">Edit on Github</a></span></footer>'
+            next(html)
+          })
         }
       ]
     }
   </script>
-  <!-- Docsify v4 -->
-  <script src="//cdn.jsdelivr.net/npm/docsify"></script>
+  <script src="//cdn.jsdelivr.net/npm/docsify@4/lib/docsify.min.js"></script>
   <script src="https://unpkg.com/docsify-themeable"></script>
   <script src="//cdn.jsdelivr.net/npm/docsify/lib/plugins/search.min.js"></script>
   <script src="//cdn.jsdelivr.net/npm/docsify-pagination/dist/docsify-pagination.min.js"></script>
   <script src="https://unpkg.com/docsify-copy-code@2"></script>
   <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-go.min.js"></script>
   <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-bash.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/docsify-progress@latest/dist/progress.min.js"></script>
 </body>
 </html>
