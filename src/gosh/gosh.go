@@ -7,7 +7,7 @@ import (
 	"os/exec"
 	"strings"
 
-	"src/debug"
+	"github.com/RythenGlyth/gosh/src/debug"
 
 	"github.com/scrouthtv/termios"
 )

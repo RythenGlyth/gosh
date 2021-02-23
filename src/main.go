@@ -4,8 +4,8 @@ import (
 	"log"
 	"os"
 
-	"src/debug"
-	"src/gosh"
+	"github.com/RythenGlyth/gosh/src/debug"
+	"github.com/RythenGlyth/gosh/src/gosh"
 )
 
 var myGosh *gosh.Gosh

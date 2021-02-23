@@ -2,11 +2,11 @@ package gosh
 
 import (
 	"container/list"
-	"src/util"
 	"strconv"
 	"strings"
 	"unicode/utf8"
 
+	"github.com/RythenGlyth/gosh/src/util"
 	"github.com/scrouthtv/termios"
 )
 
