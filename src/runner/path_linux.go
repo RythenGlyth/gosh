@@ -11,7 +11,7 @@ const (
 )
 
 func isExecutable(info os.FileInfo) bool {
-	var m os.FileMode = info.Mode()
+	m := info.Mode()
 	// only symlinks and regular files are executable
 	if (m&os.ModeType) != os.ModeSymlink && !info.Mode().IsRegular() {
 		return false

@@ -7,8 +7,8 @@ import (
 	"sync"
 )
 
-// ErrNoEnvPath is returned if no path could be determined (e. g. $PATH is unset)
-var ErrNoEnvPath error = errors.New("no $PATH variable")
+// ErrNoEnvPath is returned if no path could be determined (e. g. $PATH is unset).
+var ErrNoEnvPath error = errors.New("no $PATH variable") //nolint revive // They want to remove the error, which does not work.
 
 // Runner finds the location of commands.
 type Runner struct {
@@ -30,10 +30,11 @@ func Init() (*Runner, error) {
 		return nil, ErrNoEnvPath
 	}
 
-	var r Runner = Runner{make(map[string]*string)}
+	r := Runner{make(map[string]*string)}
 
 	for _, folder := range strings.Split(envPath, pathSep) {
 		wg.Add(1)
+
 		go r.hashFolder(folder, &wg, &px)
 	}
 

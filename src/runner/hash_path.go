@@ -9,11 +9,12 @@ const (
 	readAmount = 4096
 )
 
-func (r *Runner) hashFolder(root string, wg *sync.WaitGroup, px *sync.RWMutex) {
+func (r *Runner) hashFolder(root string, wg *sync.WaitGroup, px sync.Locker) {
 	var err error
 	var f *os.File
 	var entries []os.FileInfo
 	var ok bool
+
 	f, err = os.Open(root)
 	//if err != nil {
 	// TODO debug error
