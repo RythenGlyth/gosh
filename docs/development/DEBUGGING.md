@@ -8,6 +8,7 @@ During development, write debugging messages using
 
 The first parameter specifies a module identifier which can be set for easier readability in the debugging log. It must be greater than 0, these values already exist:
 
+|   |                |
 | - | -------------- |
 | 1 | Main Loop      |
 | 2 | Prompt drawing |
@@ -20,6 +21,8 @@ And start `gosh` with debugging enabled:
 ```
 gosh/src > go run . debug
 ```
-You will see the debugging messages being sent.
+You will see the debugging messages being sent:
+![Screenshot of `gosh` with debugging enabled](../assets/DEBUGGING-1.png)
+
 
 Stop `gosh` as usual and the debugger by pressing `C-c`.
