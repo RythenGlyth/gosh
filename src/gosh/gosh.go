@@ -7,6 +7,8 @@ import (
 	"os/exec"
 	"strings"
 
+	"gosh/debug"
+
 	"github.com/scrouthtv/termios"
 )
 
@@ -15,11 +17,16 @@ type Gosh struct {
 	term   termios.Terminal
 	prompt *Prompt
 	ready  bool
+	debug  *debug.Client
 }
 
-// NewGosh creates a new, empty gosh.
+// NewGosh creates a new, empty gosh but does not start it yet.
 func NewGosh() *Gosh {
-	return &Gosh{nil, nil, false}
+	return &Gosh{nil, nil, false, nil}
+}
+
+func (g *Gosh) SetDebugClient(c *debug.Client) {
+	g.debug = c
 }
 
 // Init prepares all sub-functionality of this gosh instance.
@@ -74,10 +81,12 @@ func (g *Gosh) Interactive() (int, error) {
 	var in []termios.Key
 	var k termios.Key
 
+	g.debug.SendMessage(1, "Going interactive")
 	g.term.Write([]byte(fmt.Sprintf("This is %s %s. Press C-d to exit.\r\n", GoshName, GoshVersion)))
 	g.prompt.redraw()
 
 	for {
+		g.debug.SendMessage(1, "Event loop")
 		g.term.SetRaw(true)
 		in, err = g.term.Read()
 		g.term.SetRaw(false)
