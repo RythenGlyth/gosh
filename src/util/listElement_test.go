@@ -18,6 +18,7 @@ func TestBasicListGet(t *testing.T) {
 		isE := ListGet(l, i)
 		if isE == nil {
 			t.Errorf("Element @%d was reported nil", i)
+			t.FailNow()
 		}
 
 		isS, ok := isE.Value.(string)

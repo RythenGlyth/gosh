@@ -145,7 +145,7 @@ loop:
 			valueBuilder.WriteString(fmt.Sprint(val))
 			break loop
 		default:
-			return nil, &LexError{errors.New("Unknown Token"), lex.codeXPos, lex.codeYPos, lex.position, lex}
+			return nil, &LexError{errors.New("unknown token"), lex.codeXPos, lex.codeYPos, lex.position, lex}
 			//fmt.Print("sas")
 		}
 	}

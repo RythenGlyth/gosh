@@ -5,9 +5,9 @@ package runner
 import "os"
 
 const (
-	path_sep = ";"
+	pathSep = ";"
 )
 
-func isExecutable(info *os.FileInfo) bool {
+func isExecutable(info os.FileInfo) bool {
 	return info.Mode().IsRegular()
 }
