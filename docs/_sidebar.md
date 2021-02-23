@@ -10,6 +10,7 @@
   * [Functions](goshscript/FUNCTIONS.md)
   * [Arrays](goshscript/ARRAYS.md)
 * [Development](development/DEVELOPMENT.md)
+  * [Plugins](development/PLUGINS.md)
   * [Terminal](development/TERMINAL.md)
   * [Debugging](development/DEBUGGING.md)
 * [Changelog](CHANGELOG.md)
