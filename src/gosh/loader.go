@@ -47,17 +47,14 @@ func (h *Handler) Load(path string) error {
 func (h *Handler) OnKey(k *termios.Key) bool {
 	var ok bool = true
 
-	h.parent.DebugMessage(3, "Sending key event to all plugins")
-
 	for _, f := range h.keyListener {
 		ok = f(h.parent, k)
 		if !ok {
-			h.parent.DebugMessage(3, "Going to return false")
+			h.parent.DebugMessage(3, "Key event was cancelled by a plugin")
 			return false
 		}
 	}
 
-	h.parent.DebugMessage(3, "Going to return true")
 	return true
 }
 

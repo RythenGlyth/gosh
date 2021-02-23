@@ -7,7 +7,7 @@ import (
 	"os/exec"
 	"strings"
 
-	"github.com/RythenGlyth/gosh/src/debug"
+	"gosh/src/debug"
 
 	"github.com/scrouthtv/termios"
 )
@@ -118,14 +118,13 @@ func (g *Gosh) Interactive() (int, error) {
 		} else {
 			for _, k = range in {
 
-				g.DebugMessage(1, "Preparing Key event")
+				if k.Equal(&keyCd) { // C-d to quit
+					return 0, nil
+				}
+
 				if !g.plugin.OnKey(&k) {
 					g.DebugMessage(1, "Skipping this key because a plugin skipped it")
 					continue
-				}
-
-				if k.Equal(&keyCd) { // C-d to quit
-					return 0, nil
 				}
 
 				// TODO event handling

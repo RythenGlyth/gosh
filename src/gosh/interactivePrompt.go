@@ -6,7 +6,8 @@ import (
 	"strings"
 	"unicode/utf8"
 
-	"github.com/RythenGlyth/gosh/src/util"
+	"gosh/src/util"
+
 	"github.com/scrouthtv/termios"
 )
 
