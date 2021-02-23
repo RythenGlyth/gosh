@@ -13,17 +13,20 @@ func TestLexer(t *testing.T) {
 	t.Logf("\n%v\n", unicode.Is(unicode.Hex_Digit, '\\'))
 	t.Logf("\n%v\n", []byte{'a', 'b', 'z', 'A', 'B', 'Z'})
 	t.Logf("\n%v\n", string([]byte{64, 65, 66, 90, 91, 92, 93, 94, 95, 96, 97, 98, 122, 123}))
-	var lex *Lexer
+
 	buff, err := ioutil.ReadFile("../test/test.gosh")
 	if err != nil {
 		t.Fatal("Could not read ../test/test.gosh")
 	}
+
 	runArr := []rune(string(buff))
-	lex = NewLexer(runArr, len(runArr), "../test/test.gosh")
+	lex := NewLexer(runArr, len(runArr), "../test/test.gosh")
 	tokens, lerr := lex.Lex()
+
 	if lerr != nil {
 		log.Fatal(lerr.Error())
 	}
+
 	t.Logf("\n%v\n", *tokens)
 }
 
@@ -42,7 +45,7 @@ func TestUnknownToken(t *testing.T) {
 	t.Log(lerr.Error())
 
 	if !ok {
-		t.Fatal("Expected an unkown error token, got", lerr.Error(), "instead")
+		t.Fatal("Expected an unknown error token, got", lerr.Error(), "instead")
 	}
 }
 

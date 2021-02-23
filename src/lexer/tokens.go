@@ -4,19 +4,19 @@ package lexer
 type TokenType string
 
 const (
-	//if nothing was found
+	// if nothing was found
 	ttEmpty      TokenType = "empty"
 	ttIdentifier TokenType = "identifier"
-	//variables identifier need to be of the following form: [$§][A-z_]+[A-z0-9_]*
-	//public variables identifier, starting with $ (until space)
+	// variables identifier need to be of the following form: [$§][A-z_]+[A-z0-9_]*
+	// public variables identifier, starting with $ (until space)
 	ttPubVarIdent TokenType = "pubVarIdent"
-	//private variables identifier, starting with § (until space)
+	// private variables identifier, starting with § (until space)
 	ttPrivVarIdent TokenType = "privVarIdent"
-	//string surrounded by quotes
+	// string surrounded by quotes
 	ttString TokenType = "string"
-	//string without quotes, need to be of the following form: [A-z_].* (until space)
+	// string without quotes, need to be of the following form: [A-z_].* (until space)
 	ttStringNQ TokenType = "stringNQ"
-	//number in decimal, could also be in base 2 (0b) or in hex (0x)
+	// number in decimal, could also be in base 2 (0b) or in hex (0x)
 	ttNumber TokenType = "number"
 
 	ttIf     TokenType = "if"
@@ -34,44 +34,44 @@ const (
 	ttComma     TokenType = ","
 	ttDot       TokenType = "."
 
-	//Modulo
+	// Modulo
 	ttPercent TokenType = "%"
-	//multiplication
+	// multiplication
 	ttStar TokenType = "*"
-	//division
+	// division
 	ttSlash TokenType = "/"
-	//Line Comment
+	// Line Comment
 	ttSlashSlash TokenType = "//"
-	//Start of Block Comment
+	// Start of Block Comment
 	ttSlashStar TokenType = "/*"
-	//End of Block Comment
+	// End of Block Comment
 	ttStarSlash TokenType = "*/"
 	ttPlus      TokenType = "+"
 	ttMinus     TokenType = "-"
 	ttBang      TokenType = "!"
-	//increase
+	// increase
 	ttPlusPlus TokenType = "++"
-	//decrease
+	// decrease
 	ttMinusMinus TokenType = "--"
-	//And
+	// And
 	ttAndAnd TokenType = "&&"
-	//Or
+	// Or
 	ttBarbar TokenType = "||"
-	//Equals
+	// Equals
 	ttEqEq TokenType = "=="
-	//Not Equals
+	// Not Equals
 	ttBangEq TokenType = "!="
-	//Smaller or equals
+	// Smaller or equals
 	ttLtEq TokenType = "<="
-	//Greater or equals
+	// Greater or equals
 	ttGteq TokenType = ">="
-	//Sets variables
+	// Sets variables
 	ttEq TokenType = "="
 	ttLt TokenType = "<"
 	ttGt TokenType = ">"
-	//Pipe left into right
+	// Pipe left into right
 	ttBar TokenType = "|"
-	//Two Commands async at a time
+	// Two Commands async at a time
 	ttAnd     TokenType = "&"
 	ttPlusEq  TokenType = "+="
 	ttMinusEq TokenType = "-="
@@ -82,7 +82,7 @@ const (
 	ttMinusGt TokenType = "->"
 )
 
-//Token for the Lexer
+// Token for the Lexer
 type Token struct {
 	tokenType TokenType
 	startPos  int

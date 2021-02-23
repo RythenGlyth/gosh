@@ -12,44 +12,47 @@ import (
 // by callintg the Lex() function.
 type Lexer struct {
 
-	//buffer containing the character of the code to analyze
+	// buffer containing the character of the code to analyze
 	buffer []rune
 
-	//character inden in buffer
+	// character inden in buffer
 	position int
 
 	codeXPos int
 	codeYPos int
 
-	//length of the content in the buffer
+	// length of the content in the buffer
 	length int
-
-	//if the last character was a backslash. used to handle escaped codes
-	wasBackslash bool
 
 	inputName string
 
 	character rune
+
+	// if the last character was a backslash. used to handle escaped codes
+	wasBackslash bool
 }
 
 // NewLexer creates a new Lexer
 func NewLexer(source []rune, length int, inputName string) *Lexer {
-	return &Lexer{source, -1, 0, 1, length, false, inputName, '\x00'}
+	return &Lexer{source, -1, 0, 1, length, inputName, '\x00', false}
 }
 
 // Lex into tokens
 func (lex *Lexer) Lex() (*[]Token, LexError) {
 	var tokens []Token
 	lex.next()
+
 	for lex.position < lex.length {
 		token, err := lex.nextToken()
 		if err != nil {
 			return &tokens, err
 		}
+
 		if token.tokenType != ttEmpty {
 			tokens = append(tokens, *token)
 		}
 	}
+
 	return &tokens, nil
 }
 
@@ -57,6 +60,7 @@ func (lex *Lexer) nextToken() (*Token, LexError) {
 	var startPos int = lex.position
 	var tokenType TokenType = ttEmpty
 	var valueBuilder strings.Builder
+
 loop:
 	for {
 		if lex.position >= lex.length {
@@ -93,18 +97,6 @@ loop:
 				switch lex.buffer[lex.position+1] {
 				case 'b', 'B':
 					lex.next()
-					/*var binaryStringBuilder strings.Builder
-					for lex.position+1 < lex.length && unicode.Is(BinaryRangeTable, lex.buffer[lex.position+1]) {
-						lex.next()
-						binaryStringBuilder.WriteRune(lex.character)
-					}
-					parsed, err := strconv.ParseInt(binaryStringBuilder.String(), 2, 64)
-					if err != nil {
-						return nil, &LexError{errors.New("Cannot read binary: " + err.Error()), lex.codeXPos, lex.codeYPos, lex.position, lex}
-					}
-					tokenType = ttNumber
-					valueBuilder.WriteString(fmt.Sprint(parsed))
-					break loop*/
 					val, err := lex.readNumber(2)
 					if err != nil {
 						return nil, err
@@ -114,18 +106,6 @@ loop:
 					break loop
 				case 'x', 'X':
 					lex.next()
-					/*var hexStringBuilder strings.Builder
-					for lex.position+1 < lex.length && unicode.Is(unicode.Hex_Digit, lex.buffer[lex.position+1]) {
-						lex.next()
-						hexStringBuilder.WriteRune(lex.character)
-					}
-					parsed, err := strconv.ParseInt(hexStringBuilder.String(), 16, 64)
-					if err != nil {
-						return nil, &LexError{errors.New("Cannot read hex: " + err.Error()), lex.codeXPos, lex.codeYPos, lex.position, lex}
-					}
-					tokenType = ttNumber
-					valueBuilder.WriteString(fmt.Sprint(parsed))
-					break loop*/
 					val, err := lex.readNumber(16)
 					if err != nil {
 						return nil, err
@@ -133,7 +113,7 @@ loop:
 					tokenType = ttNumber
 					valueBuilder.WriteString(fmt.Sprint(val))
 					break loop
-				//0rn:hhh... (number with specific radix) n=radix (between 2 and 36), h=number itself
+				// 0rn:hhh... (number with specific radix) n=radix (between 2 and 36), h=number itself
 				case 'r', 'R':
 					lex.next()
 					var numStringBuilder strings.Builder
@@ -166,10 +146,12 @@ loop:
 			break loop
 		default:
 			return nil, &UnknownTokenError{Position{lex.codeXPos, lex.codeYPos, lex.position, lex}}
-			//fmt.Print("sas")
+			// fmt.Print("sas")
 		}
 	}
+
 	lex.next()
+
 	var endpos int = lex.position
 	return &Token{tokenType, startPos, endpos, valueBuilder.String()}, nil
 }
@@ -178,56 +160,10 @@ func (lex *Lexer) next() LexError {
 	return lex.nextB(false)
 }
 
-func (lex *Lexer) nextB(wasBackslash bool) LexError {
-	lex.wasBackslash = wasBackslash
-	lex.nextPos()
-	if lex.position >= 0 && lex.position < lex.length && lex.buffer[lex.position] == '\\' && !lex.wasBackslash {
-		lex.wasBackslash = true
-		if lex.position+1 < lex.length {
-			return lex.nextB(true)
-		}
-		return &TrailingBackslashError{Position{lex.codeXPos, lex.codeYPos, lex.position, lex}}
-	}
-	if lex.position >= 0 && lex.position < lex.length {
-		if lex.wasBackslash {
-			switch lex.buffer[lex.position] {
-			case 'b':
-				lex.character = '\b'
-			case 'f':
-				lex.character = '\f'
-			case 'n':
-				lex.character = '\n'
-			case 'r':
-				lex.character = '\r'
-			case 't':
-				lex.character = '\t'
-			case 'v':
-				lex.character = '\v'
-			case '\\':
-				lex.character = '\\'
-			case '\'':
-				lex.character = '\''
-			case '"':
-				lex.character = '"'
-			case 'x', 'u', 'U':
-				lex.nextPos()
-				val, err := lex.readNumber(16)
-				if err != nil {
-					return err
-				}
-				lex.character = rune(val)
-			default:
-				return &InvalidEscapeCharacterError{Position{lex.codeXPos, lex.codeYPos, lex.position, lex}, lex.buffer[lex.position]}
-			}
-		} else {
-			lex.character = lex.buffer[lex.position]
-		}
-	}
-	return nil
-}
 func (lex *Lexer) nextPos() {
 	lex.position++
 	lex.codeXPos++
+
 	if lex.position >= 0 && lex.position < lex.length {
 		fmt.Print(hex.EncodeToString([]byte(string(lex.buffer[lex.position : lex.position+1]))))
 		fmt.Print(": " + strconv.FormatBool(lex.wasBackslash) + " : " + fmt.Sprint(lex.codeXPos))
@@ -235,63 +171,14 @@ func (lex *Lexer) nextPos() {
 	}
 }
 
-func (lex *Lexer) readNumber(radix float64) (float64, LexError) {
-	var currentVal float64
-loop:
-	for {
-		if lex.position+1 >= lex.length {
-			break loop
-		}
-		if lex.buffer[lex.position+1] == '.' {
-			lex.next()
-			var decVal float64
-		decLoop:
-			for {
-				var thisVal = getNumberValue(lex.buffer[lex.position+1])
-				if thisVal > 0 && thisVal < radix {
-
-				} else {
-					break decLoop
-				}
-			}
-			currentVal += decVal
-			break loop
-		} else {
-			currentVal *= radix
-			var thisVal = getNumberValue(lex.buffer[lex.position+1])
-			fmt.Print("_" + string(lex.buffer[lex.position+1]) + "_" + fmt.Sprint(thisVal) + ": " + fmt.Sprint(thisVal) + "\n")
-			if thisVal >= 0 && thisVal < radix {
-				currentVal += thisVal
-				lex.next()
-			} else {
-				break loop
-			}
-		}
-	}
-	return currentVal, nil
-}
-
-func getNumberValue(char rune) float64 {
-	if char >= '0' && char <= '9' {
-		return (float64)(char - '0')
-	}
-	if char >= 'A' && char <= 'Z' {
-		return (float64)(char - 'A' + 10)
-	}
-	if char >= 'a' && char <= 'z' {
-		return (float64)(char - 'a' + 10)
-	}
-	return -1
-}
-
-//BinaryRangeTable is a set of 0 and 1
+// BinaryRangeTable is a set of 0 and 1
 var BinaryRangeTable = &unicode.RangeTable{
 	R16: []unicode.Range16{
 		{0x0030, 0x0031, 1},
 	},
 }
 
-//DecimalRangeTable is a set of all decimals
+// DecimalRangeTable is a set of all decimals
 var DecimalRangeTable = &unicode.RangeTable{
 	R16: []unicode.Range16{
 		{'0', '9', 1},
