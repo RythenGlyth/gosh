@@ -118,6 +118,7 @@ func (g *Gosh) Interactive() (int, error) {
 		} else {
 			for _, k = range in {
 
+				g.DebugMessage(1, "Preparing Key event")
 				if !g.plugin.OnKey(&k) {
 					g.DebugMessage(1, "Skipping this key because a plugin skipped it")
 					continue
