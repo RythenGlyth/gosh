@@ -12,6 +12,7 @@ The first parameter specifies a module identifier which can be set for easier re
 | - | -------------- |
 | 1 | Main Loop      |
 | 2 | Prompt drawing |
+| 3 | Plugin Handler |
 
 Then start a debugging server in a seperate window using
 ```
