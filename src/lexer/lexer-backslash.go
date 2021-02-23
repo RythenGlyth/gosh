@@ -37,6 +37,7 @@ func (lex *Lexer) nextB(wasBackslash bool) LexError {
 				lex.character = '"'
 			case 'x', 'u', 'U':
 				lex.nextPos()
+
 				val, err := lex.readNumber(16)
 				if err != nil {
 					return err

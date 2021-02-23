@@ -1,18 +1,16 @@
 package main
 
 import (
-	"log"
-	"os"
-
 	"gosh/src/debug"
 	"gosh/src/gosh"
+	"log"
+	"os"
 )
 
 func main() {
-
 	myGosh := gosh.NewGosh()
-	err := myGosh.Init()
 
+	err := myGosh.Init()
 	if err != nil {
 		log.Println(err)
 		os.Exit(1)

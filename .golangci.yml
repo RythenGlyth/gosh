@@ -17,7 +17,7 @@ linters-settings:
     max-complexity: 15
     package-average: 0.0
   nestif:
-    min-complexity: 3
+    min-complexity: 5
   goconst:
     min-len: 0
     min-occurences: 3
@@ -40,7 +40,9 @@ linters-settings:
     q: true
   unused:
     check-exported: false
+  wsl:
+    allow-cuddle-declarations: true
 
 linters:
   enable-all: true
-  disable: nlreturn,ifshort,nolintlint,tparallel,paralleltest,testpackage
+  disable: nlreturn,ifshort,nolintlint,tparallel,paralleltest,testpackage,gci,scopelint,gochecknoglobals

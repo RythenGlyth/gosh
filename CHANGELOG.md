@@ -1,5 +1,5 @@
-Alpha v0.0.1
-============
+# Alpha v0.0.1
+
 This is an early preview version that showcases basic functionality of `gosh`.
 Current features are:
  - Prompt
