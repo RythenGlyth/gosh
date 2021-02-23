@@ -9,6 +9,9 @@ import (
 	ipc "github.com/scrouthtv/golang-ipc"
 )
 
+// cBufSize is the size of the client's sending buffer.
+const cBufSize = 8
+
 // Client can send debugging data from the gosh client to a gosh-debug server.
 type Client struct {
 	cc        *ipc.Client
@@ -54,7 +57,7 @@ func NewClient() (*Client, error) {
 		return nil, &LaunchError{err}
 	}
 
-	var c *Client = &Client{cc, make(chan *dMsg, 8), false}
+	c := &Client{cc, make(chan *dMsg, cBufSize), false}
 
 	go c.readLoop()
 	go c.writeLoop()
@@ -74,6 +77,7 @@ func (c *Client) status() ipc.Status {
 			return s
 		}
 	}
+
 	return -1
 }
 
@@ -86,10 +90,14 @@ func (c *Client) writeLoop() {
 		}
 
 		time.Sleep(100 * time.Millisecond)
+
 		status = c.status()
 	}
+
 	c.cc.Write(1, []byte("Connected from pid "+strconv.Itoa(os.Getpid())))
+
 	var msg *dMsg
+
 	for {
 		msg = <-c.buf
 		c.cc.Write(msg.key, []byte(msg.msg))
@@ -111,5 +119,5 @@ func (c *Client) SendMessage(k int, msg string) {
 	if c == nil || c.cc == nil {
 		return
 	}
-	c.buf <- &dMsg{k, msg} //nolint exhaustivestruct the status part is set by the API
+	c.buf <- &dMsg{k, msg}
 }

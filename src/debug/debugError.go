@@ -1,6 +1,6 @@
 package debug
 
-// LaunchError is returned if the debugger could not start
+// LaunchError is returned if the debugger could not start.
 type LaunchError struct {
 	err error
 }
@@ -13,7 +13,7 @@ func (e *LaunchError) Error() string {
 	return "error starting debugger: " + e.err.Error()
 }
 
-// WriteError is returned if an error occured whilst writing debugging data
+// WriteError is returned if an error occurred whilst writing debugging data.
 type WriteError struct {
 	err error
 }
