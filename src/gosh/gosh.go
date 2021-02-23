@@ -2,8 +2,12 @@ package gosh
 
 import (
 	"fmt"
+	"io"
 	"os"
+	"os/exec"
 	"strings"
+
+	"gosh/debug"
 
 	"github.com/scrouthtv/termios"
 )
@@ -13,11 +17,36 @@ type Gosh struct {
 	term   termios.Terminal
 	prompt *Prompt
 	ready  bool
+	debug  *debug.Client
+	plugin *Handler
 }
 
-// NewGosh creates a new, empty gosh.
+// NewGosh creates a new, empty gosh but does not start it yet.
 func NewGosh() *Gosh {
-	return &Gosh{nil, nil, false}
+	return &Gosh{nil, nil, false, nil, nil}
+}
+
+// SetDebugClient attaches the specified debugging client to
+// the gosh instance.
+func (g *Gosh) SetDebugClient(c *debug.Client) {
+	g.debug = c
+}
+
+// LoadPlugin loads the plugin specified by the path.
+// It returns an error if the file could not be read.
+func (g *Gosh) LoadPlugin(s string) error {
+	return g.plugin.Load(s)
+}
+
+// SendKey sends the specified key to all loaded plugins.
+func (g *Gosh) SendKey(s string) bool {
+	return g.plugin.OnKey(s)
+}
+
+// DebugMessage sends a message with the specified module identifier
+// and contents to the debug server.
+func (g *Gosh) DebugMessage(k int, msg string) {
+	g.debug.SendMessage(k, msg)
 }
 
 // Init prepares all sub-functionality of this gosh instance.
@@ -35,6 +64,8 @@ func (g *Gosh) Init() error {
 	g.prompt = NewPrompt(g)
 
 	g.ready = true
+
+	g.plugin = NewHandler(g)
 
 	return nil
 }
@@ -72,11 +103,14 @@ func (g *Gosh) Interactive() (int, error) {
 	var in []termios.Key
 	var k termios.Key
 
+	g.DebugMessage(1, "Going interactive")
 	g.term.Write([]byte(fmt.Sprintf("This is %s %s. Press C-d to exit.\r\n", GoshName, GoshVersion)))
 	g.prompt.redraw()
 
 	for {
+		g.term.SetRaw(true)
 		in, err = g.term.Read()
+		g.term.SetRaw(false)
 		if err != nil {
 			// Consider g.term broken:
 			os.Stdout.WriteString("Error reading input:\n")
@@ -125,6 +159,26 @@ func (g *Gosh) Eval(line string) {
 			g.WriteString(err.Error())
 			g.WriteString("\r\n")
 		}
+	} else if parts[0] == "gst" {
+		var cmd *exec.Cmd = exec.Command("git", "status")
+
+		inPipe, inErr := cmd.StdinPipe()
+		outPipe, outErr := cmd.StdoutPipe()
+		errPipe, errErr := cmd.StderrPipe()
+
+		if inErr != nil || outErr != nil || errErr != nil {
+			g.WriteString("Error running the command: \r\n")
+			g.WriteString(inErr.Error() + "\r\n")
+			g.WriteString(outErr.Error() + "\r\n")
+			g.WriteString(errErr.Error() + "\r\n")
+		}
+
+		go io.Copy(inPipe, os.Stdin)
+		go io.Copy(os.Stdout, outPipe)
+		go io.Copy(os.Stdout, errPipe)
+
+		cmd.Start()
+		cmd.Wait()
 	} else {
 		g.WriteString("Unknown command '")
 		g.WriteString(line)

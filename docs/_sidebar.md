@@ -9,4 +9,7 @@
   * [Numbers](goshscript/NUMBERS.md)
   * [Functions](goshscript/FUNCTIONS.md)
   * [Arrays](goshscript/ARRAYS.md)
+* [Development](development/DEVELOPMENT.md)
+  * [Terminal](development/TERMINAL.md)
+  * [Debugging](development/DEBUGGING.md)
 * [Changelog](CHANGELOG.md)
