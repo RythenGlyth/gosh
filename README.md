@@ -8,10 +8,11 @@ GOShell (or *gosh* in short) is a userfriendly customizable shell written in Gol
 
 All major platforms (Windows, Linux, BSD, macOS) are supported.
 
-Installation currently happens from source:
+Installation currently happens directly from source:
 ```
  ~ git clone https://github.com/RythenGlyth/gosh
- ~ go build goshell
+ ~ cd gosh/src
+ ~ go build -o goshell
  ~ sudo install -Dm755 goshell /usr/local/bin/
 ```
 
