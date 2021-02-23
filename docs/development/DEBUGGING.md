@@ -15,11 +15,11 @@ The first parameter specifies a module identifier which can be set for easier re
 | 3 | Plugin Handler |
 
 Then start a debugging server in a seperate window using
-```
+```bash
 gosh/src > go run . start-debug
 ```
 And start `gosh` with debugging enabled:
-```
+```bash
 gosh/src > go run . debug
 ```
 You will see the debugging messages being sent:

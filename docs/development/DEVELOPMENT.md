@@ -8,7 +8,7 @@ All loaded modules are stored as members of the `gosh` instance.
 
 `gosh` can currently only be built from source:
 
-```
+```bash
  ~ git clone https://github.com/RythenGlyth/gosh
  ~ cd gosh/src
  ~ go build -o goshell

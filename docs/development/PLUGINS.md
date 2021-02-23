@@ -9,24 +9,24 @@ For the Go compiler to find the `gosh` source, the plugin has to be written insi
 ## Creating Plugins
 
 1. Get the `gosh` source
-```
+```bash
  ~ > git clone https://github.com/RythenGlyth/gosh
  ~ > cd gosh
  ~/gosh > mkdir myplugin
  ~/gosh > cd myplugin
 ```
 2. Create a basic plugin (name this file `main.go`):
-```
+```go
 package main
-
+ 
 import "gosh/src/gosh"
-
+ 
 func OnKey(g *gosh.Gosh, s string) bool {
     return s == "ok"
 }
 ```
 3. Compile the plugin:
-```
+```bash
  ~/gosh/myplugin > go build -buildmode=plugin .
 ```
 Now you should end up with an `example-mod.so`. Remember its location and load it into `gosh`.
