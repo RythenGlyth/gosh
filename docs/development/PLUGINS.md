@@ -4,21 +4,22 @@ To allow every user to customize `gosh` to their needs, we introduced Plugin Sup
 
 The basic idea is that every plugin is individually compiled to a dynamic library that is loaded at runtime by the plugin handler.
 
+For the Go compiler to find the `gosh` source, the plugin has to be written inside the `gosh` tree.
+
 ## Creating Plugins
 
-1. Create a new folder for the plugin:
+1. Get the `gosh` source
 ```
- ~ > mkdir myplugin
- ~ > cd myplugin
- ~/myplugin > go mod init main
-
+ ~ > git clone https://github.com/RythenGlyth/gosh
+ ~ > cd gosh
+ ~/gosh > mkdir myplugin
+ ~/gosh > cd myplugin
 ```
-It is very important that the module name is `main`.
 2. Create a basic plugin (name this file `main.go`):
 ```
 package main
 
-import "github.com/RythenGlyth/gosh/src/gosh"
+import "gosh/src/gosh"
 
 func OnKey(g *gosh.Gosh, s string) bool {
     return s == "ok"
@@ -26,6 +27,6 @@ func OnKey(g *gosh.Gosh, s string) bool {
 ```
 3. Compile the plugin:
 ```
- ~/myplugin > go build -buildmode=plugin .
+ ~/gosh/myplugin > go build -buildmode=plugin .
 ```
-Now you should end up with a `main.so`. Remember its location and load it into `gosh`.
+Now you should end up with an `example-mod.so`. Remember its location and load it into `gosh`.
