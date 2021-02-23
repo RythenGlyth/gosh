@@ -18,17 +18,29 @@ type Gosh struct {
 	prompt *Prompt
 	ready  bool
 	debug  *debug.Client
+	plugin *Handler
 }
 
 // NewGosh creates a new, empty gosh but does not start it yet.
 func NewGosh() *Gosh {
-	return &Gosh{nil, nil, false, nil}
+	return &Gosh{nil, nil, false, nil, nil}
 }
 
 // SetDebugClient attaches the specified debugging client to
 // the gosh instance.
 func (g *Gosh) SetDebugClient(c *debug.Client) {
 	g.debug = c
+}
+
+// LoadPlugin loads the plugin specified by the path.
+// It returns an error if the file could not be read.
+func (g *Gosh) LoadPlugin(s string) error {
+	return g.plugin.Load(s)
+}
+
+// SendKey sends the specified key to all loaded plugins.
+func (g *Gosh) SendKey(s string) bool {
+	return g.plugin.OnKey(s)
 }
 
 // DebugMessage sends a message with the specified module identifier
@@ -52,6 +64,8 @@ func (g *Gosh) Init() error {
 	g.prompt = NewPrompt(g)
 
 	g.ready = true
+
+	g.plugin = NewHandler(g)
 
 	return nil
 }
