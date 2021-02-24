@@ -1,25 +1,26 @@
-package gosh
+package event
 
 import (
 	"plugin"
 
-	"github.com/scrouthtv/termios"
 	"gosh/src/shared"
+
+	"github.com/scrouthtv/termios"
 )
 
 // Handler handles all event-based plugins.
 // It is capable of loading new plugins from a specified path using the Load() method,
 // as well as sending an event to all registered plugins
-type Handler struct {
-	keyListener []func(g *Gosh, k *termios.Key) bool
-	parent      *Gosh
+type PluginManager struct {
+	keyListener []func(g shared.IGosh, k *termios.Key) bool
+	parent      shared.IGosh
 }
 
-// NewHandler creates a new plugin handler with 0 plugins pre-loaded
+// NewManager creates a new plugin manager with 0 plugins pre-loaded
 // and the specified gosh as parent.
 // g shall not be nil.
-func NewHandler(g *Gosh) *Handler {
-	return &Handler{nil, g}
+func NewManager(g shared.IGosh) *PluginManager {
+	return &PluginManager{nil, g}
 }
 
 // LoaderError is returned if an error occured during plugin loading
@@ -37,7 +38,7 @@ func (l *LoaderError) Error() string {
 
 // Load loads a plugin (shared library) from the specified path.
 // It returns an error if the file could not be found.
-func (h *Handler) Load(path string) error {
+func (h *PluginManager) Load(path string) error {
 	p, err := plugin.Open(path)
 	if err != nil {
 		h.parent.DebugMessage(shared.ModPluginLoader, "Error loading plugin: "+err.Error())
@@ -58,7 +59,7 @@ func (h *Handler) Load(path string) error {
 // OnKey sends the event to all plugins and
 // returns false as soon as the first plugin returns false
 // or true if all loaded plugins returned true.
-func (h *Handler) OnKey(k *termios.Key) bool {
+func (h *PluginManager) OnKey(k *termios.Key) bool {
 	var ok bool = true
 
 	for _, f := range h.keyListener {
@@ -72,7 +73,7 @@ func (h *Handler) OnKey(k *termios.Key) bool {
 	return true
 }
 
-func (h *Handler) loadKeyListeners(p *plugin.Plugin) bool {
+func (h *PluginManager) loadKeyListeners(p *plugin.Plugin) bool {
 	s, err := p.Lookup("OnKey")
 	if err != nil {
 		// OnKey() does not exist

@@ -2,7 +2,7 @@ package gosh
 
 import (
 	"fmt"
-	"gosh/src/debug"
+	"gosh/src/event"
 	"gosh/src/shared"
 	"io"
 	"os"
@@ -14,13 +14,14 @@ import (
 
 var keyCd termios.Key = termios.Key{Type: termios.KeyLetter, Mod: termios.ModCtrl, Value: 'd'}
 
-// Gosh type collects all modules of a gosh shell.
+// Gosh implements the IGosh type
 type Gosh struct {
-	term   termios.Terminal
-	prompt *Prompt
-	ready  bool
-	debug  *debug.Client
-	plugin *Handler
+	term    termios.Terminal
+	prompt  *Prompt
+	ready   bool
+	debug   shared.IDebugger
+	handler shared.IEventHandler
+	plugins shared.IPluginManager
 }
 
 // InitError is an error that occurred during initialization of the gosh.
@@ -38,24 +39,23 @@ func (e *InitError) Error() string {
 
 // NewGosh creates a new, empty gosh but does not start it yet.
 func NewGosh() *Gosh {
-	return &Gosh{nil, nil, false, nil, nil}
+	return &Gosh{nil, nil, false, nil, nil, nil}
 }
 
-// SetDebugClient attaches the specified debugging client to
-// the gosh instance.
-func (g *Gosh) SetDebugClient(c *debug.Client) {
+func (g *Gosh) SetDebugger(c shared.IDebugger) {
 	g.debug = c
 }
 
-// LoadPlugin loads the plugin specified by the path.
-// It returns an error if the file could not be read.
-func (g *Gosh) LoadPlugin(s string) error {
-	return g.plugin.Load(s)
+func (g *Gosh) GetDebugger() shared.IDebugger {
+	return g.debug
 }
 
-// SendKey sends the specified key to all loaded plugins.
-func (g *Gosh) SendKey(k *termios.Key) bool {
-	return g.plugin.OnKey(k)
+func (g *Gosh) GetPluginManager() shared.IPluginManager {
+	return g.plugins
+}
+
+func (g *Gosh) GetEventHandler() shared.IEventHandler {
+	return g.handler
 }
 
 // DebugMessage sends a message with the specified module identifier
@@ -82,7 +82,7 @@ func (g *Gosh) Init() error {
 
 	g.ready = true
 
-	g.plugin = NewHandler(g)
+	g.plugin = event.NewEventHandler(g)
 
 	return nil
 }

@@ -1,3 +1,3 @@
 // Package shared includes some general data for gosh.
-// It also contains the the interfaces for all modules.
+// Every module should implement interface(s) from this folder.
 package shared
