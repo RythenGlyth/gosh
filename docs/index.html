@@ -90,9 +90,12 @@
         },
         (hook, vm) => {
           hook.afterEach((html, next) => {
-            if(!vm.route.file.includes("http://") && !vm.route.file.includes("https://") )
+            if(!vm.route.file.includes("http://") && !vm.route.file.includes("https://") ) {
               html += '<hr/><footer><span><a target="_blank" href="https://github.com/RythenGlyth/gosh/tree/main/docs/' + vm.route.file + '">Edit on Github</a></span></footer>'
-            next(html)
+            } else {
+              html += '<hr/><footer><span><a target="_blank" href="' + vm.route.file + '">View Source</a></span></footer>'
+            }
+              next(html)
           })
         }
       ]
