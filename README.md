@@ -1,5 +1,5 @@
 <p align="center">
-    <img width="128" alt="GOSH" src="./docs/assets/Gosh.png"><br />
+    <img width="128" alt="GOSH" src="https://github.com/RythenGlyth/gosh/raw/main/docs/assets/Gosh.png"><br />
     GOSHell<br />
     <a href="//rythenglyth.github.io/gosh/">DOCUMENTATION</a>
 </p>
