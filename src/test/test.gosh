@@ -1,5 +1,6 @@
-"g\nog\"oä\"g;o\x3C\nog\"oä\"g;o\uD55C\U12323\xA0\xA0\xA0\xA0\xA0\xA0\xA0\xA0\xA0\xA0\xA0\xA0"; 
-'moin\'""'
-0b00 0b1110
-0b11 0b1110
-0x7fffffffffffffff 0r19:1i
+§var = "g\nog\"oä\"g;o\x3C\nog\"oä\"g;o\uD55C\U12323\xA0\xA0\xA0\xA0\xA0\xA0\xA0\xA0\xA0\xA0\xA0\xA0";
+if(§var == "a") {
+    §really = 9 == 0x9 == 0b1001 == 0r3:100;
+} else {
+    §really = 9 == 0x9 == 0b1001 == 0r3:100;
+}

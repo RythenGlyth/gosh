@@ -84,3 +84,13 @@ type InvalidEscapeCharacterError struct {
 func (e *InvalidEscapeCharacterError) Error() string {
 	return "can't escape " + string(e.ch) + " at " + e.pos.String()
 }
+
+// ReservedIdentifierError is returned if an identifier uses reserved keywords.
+type ReservedIdentifierError struct {
+	pos        Position
+	identifier string
+}
+
+func (e *ReservedIdentifierError) Error() string {
+	return "reserved identifier \"" + string(e.identifier) + "\" at " + e.pos.String()
+}

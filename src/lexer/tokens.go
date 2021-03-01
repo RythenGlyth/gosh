@@ -7,18 +7,20 @@ const (
 	// if nothing was found
 	ttEmpty      TokenType = "empty"
 	ttIdentifier TokenType = "identifier"
-	// variables identifier need to be of the following form: [$§][A-z_]+[A-z0-9_]*
+	// variables identifier need to be of the following form: [$§][A-Za-z_]+[A-z0-9_]*
 	// public variables identifier, starting with $ (until space)
 	ttPubVarIdent TokenType = "pubVarIdent"
 	// private variables identifier, starting with § (until space)
 	ttPrivVarIdent TokenType = "privVarIdent"
 	// string surrounded by quotes
 	ttString TokenType = "string"
-	// string without quotes, need to be of the following form: [A-z_].* (until space)
+	// string without quotes, can't contain special characters (until space)
 	ttStringNQ TokenType = "stringNQ"
 	// number in decimal, could also be in base 2 (0b) or in hex (0x)
 	ttNumber TokenType = "number"
 
+	ttTrue   TokenType = "true"
+	ttFalse  TokenType = "false"
 	ttIf     TokenType = "if"
 	ttElse   TokenType = "else"
 	ttFor    TokenType = "for"
@@ -33,6 +35,10 @@ const (
 	ttSemicolon TokenType = ";"
 	ttComma     TokenType = ","
 	ttDot       TokenType = "."
+	// Conditional expression
+	ttQuestion TokenType = "?"
+	// Advanced Forloop or conditional expression
+	ttColon TokenType = ":"
 
 	// Modulo
 	ttPercent TokenType = "%"

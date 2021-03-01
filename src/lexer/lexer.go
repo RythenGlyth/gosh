@@ -74,10 +74,11 @@ loop:
 			lex.next()
 			continue
 		}
-		switch lex.character {
-		case ';', ',', '.', '(', ')', '[', ']', '{', '}':
+		if unicode.Is(SingleSpecialRangeTable, lex.character) {
 			tokenType = TokenType(string(lex.character))
 			break loop
+		}
+		switch lex.character {
 		case '"', '\'':
 			stringQuotes := lex.character
 			lex.next()
@@ -144,9 +145,56 @@ loop:
 			tokenType = ttNumber
 			valueBuilder.WriteString(fmt.Sprint(val))
 			break loop
+		case '$':
+			lex.next()
+			identifier, err := lex.readVariableIdentifier()
+			if err != nil {
+				return nil, err
+			}
+			tokenType = ttPubVarIdent
+			valueBuilder.WriteString(identifier)
+			break loop
+		case '§':
+			lex.next()
+			identifier, err := lex.readVariableIdentifier()
+			if err != nil {
+				return nil, err
+			}
+			tokenType = ttPrivVarIdent
+			valueBuilder.WriteString(identifier)
+			break loop
 		default:
-			return nil, &UnknownTokenError{Position{lex.codeXPos, lex.codeYPos, lex.position, lex}}
-			// fmt.Print("sas")
+			identifier, err := lex.readIdentifier()
+			if err != nil {
+				return nil, err
+			}
+			switch strings.ToLower(identifier) {
+			case "if":
+				tokenType = ttIf
+				valueBuilder.WriteString("if")
+			case "else":
+				tokenType = ttElse
+				valueBuilder.WriteString("else")
+			case "for", "while":
+				tokenType = ttFor
+				valueBuilder.WriteString("for")
+			case "return":
+				tokenType = ttReturn
+				valueBuilder.WriteString("return")
+			case "true":
+				tokenType = ttTrue
+				valueBuilder.WriteString("true")
+			case "false":
+				tokenType = ttFalse
+				valueBuilder.WriteString("false")
+			case "do", "loop", "is", "try", "catch", "run", "switch", "case", "break", "continue", "register", "goto":
+				return nil, &ReservedIdentifierError{Position{lex.codeXPos, lex.codeYPos, lex.position, lex}, identifier}
+			default:
+				tokenType = ttIdentifier
+				valueBuilder.WriteString(identifier)
+			}
+			break loop
+			//return nil, &UnknownTokenError{Position{lex.codeXPos, lex.codeYPos, lex.position, lex}}
 		}
 	}
 
@@ -182,5 +230,18 @@ var BinaryRangeTable = &unicode.RangeTable{
 var DecimalRangeTable = &unicode.RangeTable{
 	R16: []unicode.Range16{
 		{'0', '9', 1},
+	},
+}
+
+// SingleSpecialRangeTable is a set of all ...
+var SpecialRangeTable = &unicode.RangeTable{
+	R16: []unicode.Range16{
+		{'(', ')', 1},
+		{',', ',', 1},
+		{'.', '.', 1},
+		{':', ';', 1},
+		{'?', '?', 1},
+		{'[', ']', 1},
+		{'{', '}', 1},
 	},
 }

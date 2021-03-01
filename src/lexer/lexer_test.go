@@ -40,12 +40,14 @@ func TestUnknownToken(t *testing.T) {
 	lex := NewLexer(contents, len(contents), "../test/unknownToken.gosh")
 	_, lerr := lex.Lex()
 
-	_, ok := lerr.(*UnknownTokenError)
+	if lerr != nil {
+		_, ok := lerr.(*UnknownTokenError)
 
-	t.Log(lerr.Error())
-
-	if !ok {
-		t.Fatal("Expected an unknown error token, got", lerr.Error(), "instead")
+		if !ok {
+			t.Fatal("Expected an unknown error token, got", lerr.Error(), "instead")
+		}
+	} else {
+		t.Fatal("Expected an unknown error token, got no error")
 	}
 }
 
@@ -60,11 +62,13 @@ func TestMissingQuote(t *testing.T) {
 	lex := NewLexer(contents, len(contents), "../test/missingQuote.gosh")
 	_, lerr := lex.Lex()
 
-	_, ok := lerr.(*MissingQuoteError)
+	if lerr != nil {
+		_, ok := lerr.(*MissingQuoteError)
 
-	t.Log(lerr.Error())
-
-	if !ok {
-		t.Fatal("Expected a missing quote error, got", lerr.Error(), "instead")
+		if !ok {
+			t.Fatal("Expected a missing quote error, got", lerr.Error(), "instead")
+		}
+	} else {
+		t.Fatal("Expected a missing quote error, got no error")
 	}
 }
