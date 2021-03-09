@@ -35,6 +35,8 @@ func StartDebugServer() {
 		return
 	}
 
+	log.Println("debugger ready, now open gosh with debugging enabled")
+
 	run := true
 	for run {
 		msg, err := sc.Read()
@@ -46,7 +48,8 @@ func StartDebugServer() {
 				log.Println("going to stop")
 				run = false
 			} else {
-				log.Printf("%d: %s\n", msg.MsgType, string(msg.Data))
+				name := shared.ModuleIdentifierFromInt(msg.MsgType).String()
+				log.Printf("%s: %s\n", name, string(msg.Data))
 			}
 		}
 	}
@@ -96,7 +99,7 @@ func (c *Client) writeLoop() {
 		status = c.status()
 	}
 
-	c.cc.Write(1, []byte("Connected from pid "+strconv.Itoa(os.Getpid())))
+	c.cc.Write(shared.ModMain.AsInt(), []byte("Connected from pid "+strconv.Itoa(os.Getpid())))
 
 	var msg *dMsg
 

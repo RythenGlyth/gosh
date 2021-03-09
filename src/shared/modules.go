@@ -1,5 +1,7 @@
 package shared
 
+import "strconv"
+
 type ModuleIdentifier int
 
 const (
@@ -13,6 +15,23 @@ const (
 	ModPluginLoader ModuleIdentifier = 3
 )
 
+func ModuleIdentifierFromInt(m int) ModuleIdentifier {
+	return ModuleIdentifier(m)
+}
+
 func (m ModuleIdentifier) AsInt() int {
 	return int(m)
+}
+
+func (m ModuleIdentifier) String() string {
+	switch m {
+	case ModMain:
+		return "  main"
+	case ModPrompt:
+		return "prompt"
+	case ModPluginLoader:
+		return "loader"
+	default:
+		return strconv.Itoa(int(m))
+	}
 }
