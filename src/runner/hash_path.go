@@ -2,14 +2,13 @@ package runner
 
 import (
 	"os"
-	"sync"
 )
 
 const (
 	readAmount = 4096
 )
 
-func (r *Runner) hashFolder(root string, wg *sync.WaitGroup, px sync.Locker) {
+func (r *Runner) hashFolder(root string) {
 	var err error
 	var f *os.File
 	var entries []os.FileInfo
@@ -39,11 +38,7 @@ func (r *Runner) hashFolder(root string, wg *sync.WaitGroup, px sync.Locker) {
 		}
 	}
 
-	px.Lock()
 	for _, exec := range execs {
 		r.path[exec] = &root
 	}
-	px.Unlock()
-
-	wg.Done()
 }

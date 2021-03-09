@@ -4,7 +4,6 @@ import (
 	"errors"
 	"os"
 	"strings"
-	"sync"
 )
 
 // ErrNoEnvPath is returned if no path could be determined (e. g. $PATH is unset).
@@ -21,9 +20,6 @@ func Init() (*Runner, error) {
 	var envPath string
 	var ok bool
 
-	var wg sync.WaitGroup
-	var px sync.RWMutex
-
 	envPath, ok = os.LookupEnv("PATH")
 
 	if !ok {
@@ -33,12 +29,8 @@ func Init() (*Runner, error) {
 	r := Runner{make(map[string]*string)}
 
 	for _, folder := range strings.Split(envPath, pathSep) {
-		wg.Add(1)
-
-		go r.hashFolder(folder, &wg, &px)
+		r.hashFolder(folder)
 	}
-
-	wg.Wait()
 
 	return &r, nil
 }
