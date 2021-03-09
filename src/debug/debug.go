@@ -1,12 +1,11 @@
 package debug
 
 import (
+	"gosh/src/shared"
 	"log"
 	"os"
 	"strconv"
 	"time"
-
-	"gosh/src/shared"
 
 	ipc "github.com/scrouthtv/golang-ipc"
 )

@@ -2,12 +2,12 @@ package gosh
 
 import (
 	"container/list"
+	"gosh/src/util"
 	"strconv"
 	"strings"
 	"unicode/utf8"
 
 	"github.com/scrouthtv/termios"
-	"gosh/src/util"
 )
 
 // Prompt is responsible for drawing the UI of an interactive Gosh

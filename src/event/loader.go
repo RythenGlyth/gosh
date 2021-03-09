@@ -1,9 +1,8 @@
 package event
 
 import (
-	"plugin"
-
 	"gosh/src/shared"
+	"plugin"
 
 	"github.com/scrouthtv/termios"
 )
