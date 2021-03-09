@@ -26,17 +26,17 @@ func main() {
 				log.Println(err)
 				return
 			}
-			myGosh.SetDebugClient(dc)
+			myGosh.SetDebugger(dc)
 		} else if os.Args[1] == "plugin" {
 			ds, err := debug.NewClient()
 			if err != nil {
 				log.Println(err)
 				return
 			}
-			myGosh.SetDebugClient(ds)
+			myGosh.SetDebugger(ds)
 
 			ds.SendMessage(1, "Loading example-mod.so")
-			myGosh.LoadPlugin("/home/lenni/example-mod.so")
+			myGosh.GetPluginManager().Load("/home/lenni/example-mod.so")
 		}
 	}
 

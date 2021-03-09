@@ -6,6 +6,7 @@ package shared
 type IGosh interface {
 	SetDebugger(IDebugger)
 	GetDebugger() IDebugger
+	DebugMessage(int, string)
 
 	GetPluginManager() IPluginManager
 

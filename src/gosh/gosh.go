@@ -61,6 +61,9 @@ func (g *Gosh) GetEventHandler() shared.IEventHandler {
 // DebugMessage sends a message with the specified module identifier
 // and contents to the debug server.
 func (g *Gosh) DebugMessage(k int, msg string) {
+	if g.debug == nil {
+		return
+	}
 	g.debug.SendMessage(k, msg)
 }
 
@@ -82,7 +85,7 @@ func (g *Gosh) Init() error {
 
 	g.ready = true
 
-	g.plugin = event.NewEventHandler(g)
+	g.handler = event.NewEventHandler(g)
 
 	return nil
 }
@@ -138,7 +141,7 @@ func (g *Gosh) Interactive() (int, error) {
 					return 0, nil
 				}
 
-				if !g.plugin.OnKey(&k) {
+				if !g.handler.PreSendKey(g, &k) {
 					g.DebugMessage(shared.ModMain, "Skipping this key because a plugin skipped it")
 					continue
 				}

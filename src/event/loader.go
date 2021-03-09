@@ -81,7 +81,7 @@ func (h *PluginManager) loadKeyListeners(p *plugin.Plugin) bool {
 		return false
 	}
 
-	f, ok := s.(func(g *Gosh, k *termios.Key) bool)
+	f, ok := s.(func(g shared.IGosh, k *termios.Key) bool)
 	if !ok {
 		h.parent.DebugMessage(shared.ModPluginLoader, "OnKey() has wrong signature or isn't a function")
 		return false
