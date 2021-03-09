@@ -60,7 +60,7 @@ func (g *Gosh) GetEventHandler() shared.IEventHandler {
 
 // DebugMessage sends a message with the specified module identifier
 // and contents to the debug server.
-func (g *Gosh) DebugMessage(k int, msg string) {
+func (g *Gosh) DebugMessage(k shared.ModuleIdentifier, msg string) {
 	if g.debug == nil {
 		return
 	}

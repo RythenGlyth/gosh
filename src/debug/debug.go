@@ -6,6 +6,8 @@ import (
 	"strconv"
 	"time"
 
+	"gosh/src/shared"
+
 	ipc "github.com/scrouthtv/golang-ipc"
 )
 
@@ -115,9 +117,9 @@ func (c *Client) readLoop() {
 
 // SendMessage writes a debugging message to the attached debugger.
 // If this client isn't connected, the function returns.
-func (c *Client) SendMessage(k int, msg string) {
+func (c *Client) SendMessage(k shared.ModuleIdentifier, msg string) {
 	if c == nil || c.cc == nil {
 		return
 	}
-	c.buf <- &dMsg{k, msg}
+	c.buf <- &dMsg{k.AsInt(), msg}
 }
