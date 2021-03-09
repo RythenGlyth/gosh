@@ -4,13 +4,13 @@ type ModuleIdentifier int
 
 const (
 	// ModMain is the id of the main module.
-	ModMain ModuleIdentifier = iota
+	ModMain ModuleIdentifier = 1
 
 	// ModPrompt is the id of the prompt drawing module.
-	ModPrompt ModuleIdentifier = iota
+	ModPrompt ModuleIdentifier = 2
 
 	// ModPluginLoader is the id of the plugin loader.
-	ModPluginLoader ModuleIdentifier = iota
+	ModPluginLoader ModuleIdentifier = 3
 )
 
 func (m ModuleIdentifier) AsInt() int {

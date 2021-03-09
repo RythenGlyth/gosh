@@ -64,6 +64,7 @@ func (g *Gosh) DebugMessage(k shared.ModuleIdentifier, msg string) {
 	if g.debug == nil {
 		return
 	}
+
 	g.debug.SendMessage(k, msg)
 }
 
