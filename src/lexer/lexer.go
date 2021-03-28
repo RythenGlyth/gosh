@@ -186,7 +186,7 @@ loop:
 			case "do", "loop", "is", "try", "catch", "run", "switch", "case", "break", "continue", "register", "goto":
 				return nil, &ReservedIdentifierError{Position{lex.codeXPos, lex.codeYPos, lex.position, lex}, identifier}
 			default:
-				tokenType = ttIdentifier
+				tokenType = ttString
 				valueBuilder.WriteString(identifier)
 			}
 			break loop

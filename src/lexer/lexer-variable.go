@@ -1,13 +1,12 @@
 package lexer
 
 import (
-	"fmt"
 	"strings"
 	"unicode"
 )
 
 func (lex *Lexer) readVariableIdentifier(varIdentifierBuilder *strings.Builder) (err LexError) {
-	fmt.Print(unicode.Is(VariableIdentifierRangeTable, '2'))
+	//skip first character
 	for lex.position+1 < lex.length && unicode.Is(VariableIdentifierRangeTable, lex.buffer[lex.position+1]) {
 		lex.next()
 		varIdentifierBuilder.WriteRune(lex.character)

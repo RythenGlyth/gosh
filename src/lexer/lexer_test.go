@@ -83,13 +83,29 @@ func TestVar(t *testing.T) {
 		log.Fatal(lerr.Error())
 	}
 
+	t.Logf("\n%v\n", *tokens)
+
 	if !tokenArrayEqual(*tokens, []Token{{ttPrivVarIdent, 0, 9, "test23er"}, {ttPubVarIdent, 9, 21, "789test_01"}}) {
 		t.FailNow()
 	}
-
-	t.Logf("\n%v\n", *tokens)
 }
 
 func tokenArrayEqual(a, b []Token) bool {
 	return reflect.DeepEqual(a, b)
+}
+
+func TestIdentifier(t *testing.T) {
+	arr := []rune("if() { sos nä? ife }")
+	lex := NewLexer(arr, len(arr), "../test/test.gosh")
+	tokens, lerr := lex.Lex()
+
+	if lerr != nil {
+		log.Fatal(lerr.Error())
+	}
+
+	t.Logf("\n%v\n", *tokens)
+
+	if !tokenArrayEqual(*tokens, []Token{{ttIf, 0, 2, "if"}, {ttLParen, 2, 3, ""}, {ttRParen, 3, 4, ""}, {ttLBrace, 4, 6, ""}, {ttString, 6, 10, "sos"}, {ttString, 10, 14, "nä?"}, {ttString, 14, 18, "ife"}, {ttRBrace, 18, 20, ""}}) {
+		t.FailNow()
+	}
 }
