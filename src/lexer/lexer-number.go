@@ -1,21 +1,27 @@
 package lexer
 
 import (
-	"fmt"
 	"math"
 )
 
 func (lex *Lexer) readNumber(radix float64) (float64, LexError) {
 	var currentVal float64
+	thisVal := getNumberValue(lex.buffer[lex.position])
+	if thisVal >= 0 && thisVal < radix {
+		currentVal *= radix
+		currentVal += thisVal
+	} else {
+		return 0, nil
+	}
 loop:
-	for lex.position < lex.length {
-		if lex.character == '.' {
+	for lex.position+1 < lex.length {
+		if lex.buffer[lex.position+1] == '.' {
 			lex.next()
 			//var decVal float64
 			var i float64 = 1
 		decLoop:
-			for lex.position < lex.length {
-				thisVal := getNumberValue(lex.character)
+			for lex.position+1 < lex.length {
+				thisVal := getNumberValue(lex.buffer[lex.position+1])
 				if thisVal >= 0 && thisVal < radix {
 					//decVal *= radix
 					//decVal += thisVal
@@ -29,8 +35,7 @@ loop:
 			//currentVal += decVal
 			break loop
 		} else {
-			thisVal := getNumberValue(lex.character)
-			fmt.Print("_" + string(lex.character) + "_" + fmt.Sprint(thisVal) + ": " + fmt.Sprint(thisVal) + "\n")
+			thisVal := getNumberValue(lex.buffer[lex.position+1])
 			if thisVal >= 0 && thisVal < radix {
 				currentVal *= radix
 				currentVal += thisVal

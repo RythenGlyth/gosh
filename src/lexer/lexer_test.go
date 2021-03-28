@@ -1,9 +1,9 @@
 package lexer
 
 import (
+	"fmt"
 	"io/ioutil"
 	"log"
-	"reflect"
 	"testing"
 	"unicode"
 )
@@ -70,7 +70,31 @@ func TestVar(t *testing.T) {
 }
 
 func tokenArrayEqual(a, b []Token) bool {
-	return reflect.DeepEqual(a, b)
+	if len(a) != len(b) {
+		fmt.Println("Lengths differ")
+		return false
+	}
+	for i, ta := range a {
+		tb := b[i]
+
+		if ta.endPos != tb.endPos {
+			fmt.Printf("endPos of %d of differ\n", i)
+			return false
+		}
+		if ta.startPos != tb.startPos {
+			fmt.Printf("startPos of %d of differ\n", i)
+			return false
+		}
+		if ta.tokenType != tb.tokenType {
+			fmt.Printf("tokenType of %d of differ\n", i)
+			return false
+		}
+		if ta.value != tb.value {
+			fmt.Printf("value of %d of differ\n", i)
+			return false
+		}
+	}
+	return true
 }
 
 func TestIdentifier(t *testing.T) {
@@ -89,9 +113,9 @@ func TestIdentifier(t *testing.T) {
 	}
 }
 
-func TestNumerus(t *testing.T) {
+func TestNumerus(t *testing.T) { //TODO .5
 
-	arr := []rune("3 0x410 0b101 3.1 7.54 3.01 0xf.8 3.000000000000001")
+	arr := []rune("3 0x410 0b101 3.1 7.54 3.01 0xf.8 3.000000000000001 0r3:10 0xD55C")
 	lex := NewLexer(arr, len(arr), "../test/test.gosh")
 	tokens, lerr := lex.Lex()
 
@@ -101,7 +125,23 @@ func TestNumerus(t *testing.T) {
 
 	t.Log(TokenArrayToString(tokens))
 
-	if !tokenArrayEqual(*tokens, []Token{{ttIf, 0, 2, "if"}, {ttLParen, 2, 3, ""}, {ttRParen, 3, 4, ""}, {ttLBrace, 4, 6, ""}, {ttString, 6, 10, "sos"}, {ttString, 10, 14, "nä?"}, {ttString, 14, 18, "ife"}, {ttRBrace, 18, 20, ""}}) {
+	if !tokenArrayEqual(*tokens, []Token{{ttNumber, 0, 1, 3.0}, {ttNumber, 1, 7, 1040.0}, {ttNumber, 7, 13, 5.0}, {ttNumber, 13, 17, 3.1}, {ttNumber, 17, 22, 7.54}, {ttNumber, 22, 27, 3.01}, {ttNumber, 27, 33, 15.5}, {ttNumber, 33, 51, 3.000000000000001}, {ttNumber, 51, 58, 3.0}, {ttNumber, 58, 65, 54620.0}}) {
+		t.FailNow()
+	}
+}
+
+func TestSpecials(t *testing.T) {
+	arr := []rune("\"\\uD55C\\U12323\"")
+	lex := NewLexer(arr, len(arr), "../test/test.gosh")
+	tokens, lerr := lex.Lex()
+
+	if lerr != nil {
+		log.Fatal(lerr.Error())
+	}
+
+	t.Log(TokenArrayToString(tokens))
+
+	if !tokenArrayEqual(*tokens, []Token{{ttString, 0, 15, "\uD55C\U00012323"}}) {
 		t.FailNow()
 	}
 }

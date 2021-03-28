@@ -112,6 +112,7 @@ loop:
 			stringQuotes := lex.character
 			lex.next()
 			for lex.character != stringQuotes || lex.wasBackslash {
+				fmt.Print(string(lex.character))
 				if lex.position+1 < lex.length {
 					valueBuilder.WriteRune(lex.character)
 					lex.next()
@@ -153,12 +154,12 @@ loop:
 				// 0rn:hhh... (number with specific radix) n=radix (between 2 and 36), h=number itself
 				case 'r', 'R':
 					lex.next()
-					lex.next()
 					var numStringBuilder strings.Builder
 					for lex.position+1 < lex.length && lex.buffer[lex.position+1] != ':' {
 						lex.next()
 						numStringBuilder.WriteRune(lex.character)
 					}
+					lex.next()
 					lex.next()
 					radix, err := strconv.ParseFloat(numStringBuilder.String(), 10)
 					if err != nil {

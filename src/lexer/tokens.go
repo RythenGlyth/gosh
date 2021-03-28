@@ -257,16 +257,18 @@ func (t *Token) StringifyIntoBuilder(builder *strings.Builder) {
 	builder.WriteString(fmt.Sprint(t.endPos))
 	builder.WriteRune(',')
 	builder.WriteRune(' ')
-	builder.WriteString(fmt.Sprint(t.value))
+	builder.WriteString(fmt.Sprintf("%v", t.value))
 	builder.WriteRune('}')
 }
 
 func TokenArrayToString(tokenArray *[]Token) string {
 	var builder strings.Builder
+	builder.WriteRune('{')
 	for _, t := range *tokenArray {
 		t.StringifyIntoBuilder(&builder)
 		builder.WriteRune(',')
-		builder.WriteRune(' ')
+		builder.WriteRune('\n')
 	}
+	builder.WriteRune('}')
 	return builder.String()
 }
