@@ -74,11 +74,40 @@ loop:
 			lex.next()
 			continue
 		}
-		if unicode.Is(SingleSpecialRangeTable, lex.character) {
-			tokenType = TokenType(string(lex.character))
-			break loop
-		}
 		switch lex.character {
+		case '(':
+			tokenType = ttLParen
+			break loop
+		case ')':
+			tokenType = ttRParen
+			break loop
+		case ',':
+			tokenType = ttComma
+			break loop
+		case '.':
+			tokenType = ttDot
+			break loop
+		case ':':
+			tokenType = ttColon
+			break loop
+		case ';':
+			tokenType = ttSemicolon
+			break loop
+		case '?':
+			tokenType = ttQuestion
+			break loop
+		case '[':
+			tokenType = ttLBracket
+			break loop
+		case ']':
+			tokenType = ttRBracket
+			break loop
+		case '{':
+			tokenType = ttLBrace
+			break loop
+		case '}':
+			tokenType = ttRBrace
+			break loop
 		case '"', '\'':
 			stringQuotes := lex.character
 			lex.next()
@@ -91,31 +120,39 @@ loop:
 				}
 			}
 			tokenType = ttString
-			fmt.Print("sos")
 			break loop
 		case '0':
 			if lex.position+1 < lex.length {
 				switch lex.buffer[lex.position+1] {
 				case 'b', 'B':
 					lex.next()
+					lex.next()
 					val, err := lex.readNumber(2)
 					if err != nil {
 						return nil, err
 					}
 					tokenType = ttNumber
-					valueBuilder.WriteString(fmt.Sprint(val))
-					break loop
+
+					lex.next()
+
+					var endpos int = lex.position
+					return &Token{tokenType, startPos, endpos, val}, nil
 				case 'x', 'X':
+					lex.next()
 					lex.next()
 					val, err := lex.readNumber(16)
 					if err != nil {
 						return nil, err
 					}
 					tokenType = ttNumber
-					valueBuilder.WriteString(fmt.Sprint(val))
-					break loop
+
+					lex.next()
+
+					var endpos int = lex.position
+					return &Token{tokenType, startPos, endpos, val}, nil
 				// 0rn:hhh... (number with specific radix) n=radix (between 2 and 36), h=number itself
 				case 'r', 'R':
+					lex.next()
 					lex.next()
 					var numStringBuilder strings.Builder
 					for lex.position+1 < lex.length && lex.buffer[lex.position+1] != ':' {
@@ -132,8 +169,11 @@ loop:
 						return nil, err2
 					}
 					tokenType = ttNumber
-					valueBuilder.WriteString(fmt.Sprint(val))
-					break loop
+
+					lex.next()
+
+					var endpos int = lex.position
+					return &Token{tokenType, startPos, endpos, val}, nil
 				}
 			}
 			fallthrough
@@ -143,8 +183,11 @@ loop:
 				return nil, err
 			}
 			tokenType = ttNumber
-			valueBuilder.WriteString(fmt.Sprint(val))
-			break loop
+
+			lex.next()
+
+			var endpos int = lex.position
+			return &Token{tokenType, startPos, endpos, val}, nil
 		case '$':
 			err := lex.readVariableIdentifier(&valueBuilder)
 			if err != nil {
@@ -159,6 +202,20 @@ loop:
 			}
 			tokenType = ttPrivVarIdent
 			break loop
+		case '%', '*', '/', '+', '-', '|', '&', '=', '<', '>', '!':
+			tt, ok := MappedIt[string(lex.character)+string(lex.buffer[lex.position+1])]
+			if lex.position+1 < lex.length && ok {
+				tokenType = tt
+				lex.next()
+				break loop
+			} else {
+				tt, ok = MappedIt[string(lex.character)]
+				if ok {
+					tokenType = tt
+					break loop
+				}
+			}
+			fallthrough
 		default:
 			identifier, err := lex.readIdentifier()
 			if err != nil {
@@ -226,18 +283,5 @@ var BinaryRangeTable = &unicode.RangeTable{
 var DecimalRangeTable = &unicode.RangeTable{
 	R16: []unicode.Range16{
 		{'0', '9', 1},
-	},
-}
-
-// SingleSpecialRangeTable is a set of all ...
-var SingleSpecialRangeTable = &unicode.RangeTable{
-	R16: []unicode.Range16{
-		{'(', ')', 1},
-		{',', ',', 1},
-		{'.', '.', 1},
-		{':', ';', 1},
-		{'?', '?', 1},
-		{'[', ']', 1},
-		{'{', '}', 1},
 	},
 }

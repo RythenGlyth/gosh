@@ -1,4 +1,4 @@
-§var = "g\nog\"oä\"g;o\x3C\nog\"oä\"g;o\uD55C\U12323\xA0\xA0\xA0\xA0\xA0\xA0\xA0\xA0\xA0\xA0\xA0\xA0";
+§var = "g\nog\"oä\"g;o\x3C\nog\"oä\"g;o\uD55C\U12323";
 if(§var == "a") {
     §really = 9 == 0x9 == 0b1001 == 0r3:100;
 } else {

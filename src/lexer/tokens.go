@@ -1,91 +1,100 @@
 package lexer
 
+import (
+	"fmt"
+	"strings"
+)
+
 // TokenType is a type of token
-type TokenType string
+type TokenType uint8
 
 const (
 	// if nothing was found
-	ttEmpty      TokenType = "empty"
-	ttIdentifier TokenType = "identifier"
+	ttEmpty TokenType = iota
+	ttIdentifier
 	// variables identifier need to be of the following form: [$§][A-Za-z_]+[A-z0-9_]*
 	// public variables identifier, starting with $ (until space)
-	ttPubVarIdent TokenType = "pubVarIdent"
+	ttPubVarIdent
 	// private variables identifier, starting with § (until space)
-	ttPrivVarIdent TokenType = "privVarIdent"
+	ttPrivVarIdent
 	// string surrounded by quotes
-	ttString TokenType = "string"
-	// string without quotes, can't contain special characters (until space)
-	ttStringNQ TokenType = "stringNQ"
+	ttString
 	// number in decimal, could also be in base 2 (0b) or in hex (0x)
-	ttNumber TokenType = "number"
+	ttNumber
 
-	ttTrue   TokenType = "true"
-	ttFalse  TokenType = "false"
-	ttIf     TokenType = "if"
-	ttElse   TokenType = "else"
-	ttFor    TokenType = "for"
-	ttReturn TokenType = "return"
+	ttTrue
+	ttFalse
+	ttIf
+	ttElse
+	ttFor
+	ttReturn
 
-	ttLParen    TokenType = "("
-	ttRParen    TokenType = ")"
-	ttLBrace    TokenType = "{"
-	ttRBrace    TokenType = "}"
-	ttLBracket  TokenType = "["
-	ttRBracket  TokenType = "]"
-	ttSemicolon TokenType = ";"
-	ttComma     TokenType = ","
-	ttDot       TokenType = "."
+	ttLParen
+	ttRParen
+	// {: start of block
+	ttLBrace
+	// }: end of block
+	ttRBrace
+	// [: start of array
+	ttLBracket
+	// ]: end of array
+	ttRBracket
+	ttSemicolon
+	ttComma
+	ttDot
 	// Conditional expression
-	ttQuestion TokenType = "?"
+	ttQuestion
 	// Advanced Forloop or conditional expression
-	ttColon TokenType = ":"
+	ttColon
 
 	// Modulo
-	ttPercent TokenType = "%"
+	ttPercent
 	// multiplication
-	ttStar TokenType = "*"
+	ttStar
 	// division
-	ttSlash TokenType = "/"
+	ttSlash
 	// Line Comment
-	ttSlashSlash TokenType = "//"
+	ttSlashSlash
 	// Start of Block Comment
-	ttSlashStar TokenType = "/*"
+	ttSlashStar
 	// End of Block Comment
-	ttStarSlash TokenType = "*/"
-	ttPlus      TokenType = "+"
-	ttMinus     TokenType = "-"
-	ttBang      TokenType = "!"
+	ttStarSlash
+	ttPlus
+	ttMinus
+	ttBang
 	// increase
-	ttPlusPlus TokenType = "++"
+	ttPlusPlus
 	// decrease
-	ttMinusMinus TokenType = "--"
+	ttMinusMinus
 	// And
-	ttAndAnd TokenType = "&&"
-	// Or
-	ttBarbar TokenType = "||"
+	ttAndAnd
+	// ||: Or
+	ttBarbar
 	// Equals
-	ttEqEq TokenType = "=="
-	// Not Equals
-	ttBangEq TokenType = "!="
+	ttEqEq
+	// !=: Not Equals
+	ttBangEq
 	// Smaller or equals
-	ttLtEq TokenType = "<="
+	ttLtEq
 	// Greater or equals
-	ttGteq TokenType = ">="
+	ttGtEq
 	// Sets variables
-	ttEq TokenType = "="
-	ttLt TokenType = "<"
-	ttGt TokenType = ">"
-	// Pipe left into right
-	ttBar TokenType = "|"
+	ttEq
+	ttLt
+	ttGt
+	// |: Pipe left into right
+	ttBar
 	// Two Commands async at a time
-	ttAnd     TokenType = "&"
-	ttPlusEq  TokenType = "+="
-	ttMinusEq TokenType = "-="
-	ttStarEq  TokenType = "*="
-	ttSlashEq TokenType = "/="
-	ttPerEq   TokenType = "%="
-	ttEqGt    TokenType = "=>"
-	ttMinusGt TokenType = "->"
+	ttAnd
+	ttPlusEq
+	ttMinusEq
+	ttStarEq
+	ttSlashEq
+	ttPerEq
+	// =>: arrow (for lambda)
+	ttEqGt
+	// ->: arrow (for lambda)
+	ttMinusGt
 )
 
 // Token for the Lexer
@@ -93,5 +102,171 @@ type Token struct {
 	tokenType TokenType
 	startPos  int
 	endPos    int
-	value     string
+	value     interface{}
+}
+
+func (tt TokenType) String() string {
+	switch tt {
+	case ttIdentifier:
+		return "ttIdentifier"
+	case ttPubVarIdent:
+		return "ttPubVarIdent"
+	case ttPrivVarIdent:
+		return "ttPrivVarIdent"
+	case ttString:
+		return "ttString"
+	case ttNumber:
+		return "ttNumber"
+	case ttTrue:
+		return "ttTrue"
+	case ttFalse:
+		return "ttFalse"
+	case ttIf:
+		return "ttIf"
+	case ttElse:
+		return "ttElse"
+	case ttFor:
+		return "ttFor"
+	case ttReturn:
+		return "ttReturn"
+	case ttLParen:
+		return "ttLParen"
+	case ttRParen:
+		return "ttRParen"
+	case ttLBrace:
+		return "ttLBrace"
+	case ttRBrace:
+		return "ttRBrace"
+	case ttLBracket:
+		return "ttLBracket"
+	case ttRBracket:
+		return "ttRBracket"
+	case ttSemicolon:
+		return "ttSemicolon"
+	case ttComma:
+		return "ttComma"
+	case ttDot:
+		return "ttDot"
+	case ttQuestion:
+		return "ttQuestion"
+	case ttColon:
+		return "ttColon"
+	case ttPercent:
+		return "ttPercent"
+	case ttStar:
+		return "ttStar"
+	case ttSlash:
+		return "ttSlash"
+	case ttSlashSlash:
+		return "ttSlashSlash"
+	case ttSlashStar:
+		return "ttSlashStar"
+	case ttStarSlash:
+		return "ttStarSlash"
+	case ttPlus:
+		return "ttPlus"
+	case ttMinus:
+		return "ttMinus"
+	case ttBang:
+		return "ttBang"
+	case ttPlusPlus:
+		return "ttPlusPlus"
+	case ttMinusMinus:
+		return "ttMinusMinus"
+	case ttAndAnd:
+		return "ttAndAnd"
+	case ttBarbar:
+		return "ttBarbar"
+	case ttEqEq:
+		return "ttEqEq"
+	case ttBangEq:
+		return "ttBangEq"
+	case ttLtEq:
+		return "ttLtEq"
+	case ttGtEq:
+		return "ttGteq"
+	case ttEq:
+		return "ttEq"
+	case ttLt:
+		return "ttLt"
+	case ttGt:
+		return "ttGt"
+	case ttBar:
+		return "ttBar"
+	case ttAnd:
+		return "ttAnd"
+	case ttPlusEq:
+		return "ttPlusEq"
+	case ttMinusEq:
+		return "ttMinusEq"
+	case ttStarEq:
+		return "ttStarEq"
+	case ttSlashEq:
+		return "ttSlashEq"
+	case ttPerEq:
+		return "ttPerEq"
+	case ttEqGt:
+		return "ttEqGt"
+	case ttMinusGt:
+		return "ttMinusGt"
+	default:
+		return "ttEmpty"
+	}
+}
+
+var MappedIt = map[string]TokenType{
+	"%":  ttPercent,
+	"*":  ttStar,
+	"/":  ttSlash,
+	"//": ttSlashSlash,
+	"/*": ttSlashStar,
+	"*/": ttStarSlash,
+	"+":  ttPlus,
+	"-":  ttMinus,
+	"!":  ttBang,
+	"++": ttPlusPlus,
+	"--": ttMinusMinus,
+	"&&": ttAndAnd,
+	"||": ttBarbar,
+	"==": ttEqEq,
+	"!=": ttBangEq,
+	"<=": ttLtEq,
+	">=": ttGtEq,
+	"=":  ttEq,
+	"<":  ttLt,
+	">":  ttGt,
+	"|":  ttBar,
+	"&":  ttAnd,
+	"+=": ttPlusEq,
+	"-=": ttMinusEq,
+	"*=": ttStarEq,
+	"/=": ttSlashEq,
+	"%=": ttPerEq,
+	"=>": ttEqGt,
+	"->": ttMinusGt,
+}
+
+func (t *Token) StringifyIntoBuilder(builder *strings.Builder) {
+	builder.WriteRune('{')
+	builder.WriteString(t.tokenType.String())
+	builder.WriteRune(',')
+	builder.WriteRune(' ')
+	builder.WriteString(fmt.Sprint(t.startPos))
+	builder.WriteRune(',')
+	builder.WriteRune(' ')
+	builder.WriteString(fmt.Sprint(t.endPos))
+	builder.WriteRune(',')
+	builder.WriteRune(' ')
+	builder.WriteString(fmt.Sprint(t.value))
+	builder.WriteRune('}')
+}
+
+func TokenArrayToString(tokenArray *[]Token) string {
+	var builder strings.Builder
+	for _, t := range *tokenArray {
+		t.StringifyIntoBuilder(&builder)
+		builder.WriteRune(',')
+		builder.WriteRune(' ')
+	}
+	return builder.String()
 }

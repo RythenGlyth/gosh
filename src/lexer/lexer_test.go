@@ -28,28 +28,7 @@ func TestLexer(t *testing.T) {
 		log.Fatal(lerr.Error())
 	}
 
-	t.Logf("\n%v\n", *tokens)
-}
-
-func TestUnknownToken(t *testing.T) {
-	buf, err := ioutil.ReadFile("../test/unknownToken.gosh")
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	contents := []rune(string(buf))
-	lex := NewLexer(contents, len(contents), "../test/unknownToken.gosh")
-	_, lerr := lex.Lex()
-
-	if lerr != nil {
-		_, ok := lerr.(*UnknownTokenError)
-
-		if !ok {
-			t.Fatal("Expected an unknown error token, got", lerr.Error(), "instead")
-		}
-	} else {
-		t.Fatal("Expected an unknown error token, got no error")
-	}
+	t.Log(TokenArrayToString(tokens))
 }
 
 func TestMissingQuote(t *testing.T) {
@@ -104,6 +83,23 @@ func TestIdentifier(t *testing.T) {
 	}
 
 	t.Logf("\n%v\n", *tokens)
+
+	if !tokenArrayEqual(*tokens, []Token{{ttIf, 0, 2, "if"}, {ttLParen, 2, 3, ""}, {ttRParen, 3, 4, ""}, {ttLBrace, 4, 6, ""}, {ttString, 6, 10, "sos"}, {ttString, 10, 14, "nä?"}, {ttString, 14, 18, "ife"}, {ttRBrace, 18, 20, ""}}) {
+		t.FailNow()
+	}
+}
+
+func TestNumerus(t *testing.T) {
+
+	arr := []rune("3 0x410 0b101 3.1 7.54 3.01 0xf.8 3.000000000000001")
+	lex := NewLexer(arr, len(arr), "../test/test.gosh")
+	tokens, lerr := lex.Lex()
+
+	if lerr != nil {
+		log.Fatal(lerr.Error())
+	}
+
+	t.Log(TokenArrayToString(tokens))
 
 	if !tokenArrayEqual(*tokens, []Token{{ttIf, 0, 2, "if"}, {ttLParen, 2, 3, ""}, {ttRParen, 3, 4, ""}, {ttLBrace, 4, 6, ""}, {ttString, 6, 10, "sos"}, {ttString, 10, 14, "nä?"}, {ttString, 14, 18, "ife"}, {ttRBrace, 18, 20, ""}}) {
 		t.FailNow()
