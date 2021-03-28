@@ -246,6 +246,12 @@ var MappedIt = map[string]TokenType{
 	"->": ttMinusGt,
 }
 
+func (t *Token) String() string {
+	var builder strings.Builder
+	t.StringifyIntoBuilder(&builder)
+	return builder.String()
+}
+
 func (t *Token) StringifyIntoBuilder(builder *strings.Builder) {
 	builder.WriteRune('{')
 	builder.WriteString(t.tokenType.String())

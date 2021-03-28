@@ -85,6 +85,17 @@ loop:
 			tokenType = ttComma
 			break loop
 		case '.':
+			if lex.position+1 < lex.length {
+				if unicode.IsNumber(lex.buffer[lex.position+1]) {
+					var numVal float64
+					lex.addDecimalNumber(10, &numVal)
+
+					lex.next()
+
+					var endpos int = lex.position
+					return &Token{ttNumber, startPos, endpos, numVal}, nil
+				}
+			}
 			tokenType = ttDot
 			break loop
 		case ':':

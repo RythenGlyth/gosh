@@ -6,33 +6,23 @@ import (
 
 func (lex *Lexer) readNumber(radix float64) (float64, LexError) {
 	var currentVal float64
-	thisVal := getNumberValue(lex.buffer[lex.position])
-	if thisVal >= 0 && thisVal < radix {
-		currentVal *= radix
-		currentVal += thisVal
+	if lex.buffer[lex.position] == '.' {
+		lex.addDecimalNumber(radix, &currentVal)
+		return currentVal, nil
 	} else {
-		return 0, nil
+		thisVal := getNumberValue(lex.buffer[lex.position])
+		if thisVal >= 0 && thisVal < radix {
+			currentVal *= radix
+			currentVal += thisVal
+		} else {
+			return 0, nil
+		}
 	}
 loop:
 	for lex.position+1 < lex.length {
 		if lex.buffer[lex.position+1] == '.' {
 			lex.next()
-			//var decVal float64
-			var i float64 = 1
-		decLoop:
-			for lex.position+1 < lex.length {
-				thisVal := getNumberValue(lex.buffer[lex.position+1])
-				if thisVal >= 0 && thisVal < radix {
-					//decVal *= radix
-					//decVal += thisVal
-					currentVal += thisVal / math.Pow(radix, i)
-					lex.next()
-					i++
-				} else {
-					break decLoop
-				}
-			}
-			//currentVal += decVal
+			lex.addDecimalNumber(radix, &currentVal)
 			break loop
 		} else {
 			thisVal := getNumberValue(lex.buffer[lex.position+1])
@@ -47,6 +37,22 @@ loop:
 	}
 
 	return currentVal, nil
+}
+func (lex *Lexer) addDecimalNumber(radix float64, currentVal *float64) {
+	var i float64 = 1
+decLoop:
+	for lex.position+1 < lex.length {
+		thisVal := getNumberValue(lex.buffer[lex.position+1])
+		if thisVal >= 0 && thisVal < radix {
+			//decVal *= radix
+			//decVal += thisVal
+			*currentVal += thisVal / math.Pow(radix, i)
+			lex.next()
+			i++
+		} else {
+			break decLoop
+		}
+	}
 }
 
 func getNumberValue(char rune) float64 {

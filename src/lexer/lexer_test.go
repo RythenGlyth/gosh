@@ -78,19 +78,19 @@ func tokenArrayEqual(a, b []Token) bool {
 		tb := b[i]
 
 		if ta.endPos != tb.endPos {
-			fmt.Printf("endPos of %d of differ\n", i)
+			fmt.Printf("endPos of %d (%v : %v) of differ\n", i, ta.String(), tb.String())
 			return false
 		}
 		if ta.startPos != tb.startPos {
-			fmt.Printf("startPos of %d of differ\n", i)
+			fmt.Printf("startPos of %d (%v : %v) of differ\n", i, ta.String(), tb.String())
 			return false
 		}
 		if ta.tokenType != tb.tokenType {
-			fmt.Printf("tokenType of %d of differ\n", i)
+			fmt.Printf("tokenType of %d (%v : %v) of differ\n", i, ta.String(), tb.String())
 			return false
 		}
 		if ta.value != tb.value {
-			fmt.Printf("value of %d of differ\n", i)
+			fmt.Printf("value of %d (%v : %v) of differ\n", i, ta.String(), tb.String())
 			return false
 		}
 	}
@@ -115,7 +115,7 @@ func TestIdentifier(t *testing.T) {
 
 func TestNumerus(t *testing.T) { //TODO .5
 
-	arr := []rune("3 0x410 0b101 3.1 7.54 3.01 0xf.8 3.000000000000001 0r3:10 0xD55C")
+	arr := []rune("3 0x410 0b101 3.1 7.54 3.01 0xf.8 3.000000000000001 0r3:10 0xD55C .5 0x.1")
 	lex := NewLexer(arr, len(arr), "../test/test.gosh")
 	tokens, lerr := lex.Lex()
 
@@ -125,7 +125,7 @@ func TestNumerus(t *testing.T) { //TODO .5
 
 	t.Log(TokenArrayToString(tokens))
 
-	if !tokenArrayEqual(*tokens, []Token{{ttNumber, 0, 1, 3.0}, {ttNumber, 1, 7, 1040.0}, {ttNumber, 7, 13, 5.0}, {ttNumber, 13, 17, 3.1}, {ttNumber, 17, 22, 7.54}, {ttNumber, 22, 27, 3.01}, {ttNumber, 27, 33, 15.5}, {ttNumber, 33, 51, 3.000000000000001}, {ttNumber, 51, 58, 3.0}, {ttNumber, 58, 65, 54620.0}}) {
+	if !tokenArrayEqual(*tokens, []Token{{ttNumber, 0, 1, 3.0}, {ttNumber, 1, 7, 1040.0}, {ttNumber, 7, 13, 5.0}, {ttNumber, 13, 17, 3.1}, {ttNumber, 17, 22, 7.54}, {ttNumber, 22, 27, 3.01}, {ttNumber, 27, 33, 15.5}, {ttNumber, 33, 51, 3.000000000000001}, {ttNumber, 51, 58, 3.0}, {ttNumber, 58, 65, 54620.0}, {ttNumber, 65, 68, 0.5}, {ttNumber, 68, 73, 1.0 / 16}}) {
 		t.FailNow()
 	}
 }
