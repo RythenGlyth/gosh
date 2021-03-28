@@ -3,6 +3,7 @@ package lexer
 import (
 	"io/ioutil"
 	"log"
+	"reflect"
 	"testing"
 	"unicode"
 )
@@ -71,4 +72,24 @@ func TestMissingQuote(t *testing.T) {
 	} else {
 		t.Fatal("Expected a missing quote error, got no error")
 	}
+}
+
+func TestVar(t *testing.T) {
+	arr := []rune("§test23er $789test_01")
+	lex := NewLexer(arr, len(arr), "../test/test.gosh")
+	tokens, lerr := lex.Lex()
+
+	if lerr != nil {
+		log.Fatal(lerr.Error())
+	}
+
+	if !tokenArrayEqual(*tokens, []Token{{ttPrivVarIdent, 0, 9, "test23er"}, {ttPubVarIdent, 9, 21, "789test_01"}}) {
+		t.FailNow()
+	}
+
+	t.Logf("\n%v\n", *tokens)
+}
+
+func tokenArrayEqual(a, b []Token) bool {
+	return reflect.DeepEqual(a, b)
 }

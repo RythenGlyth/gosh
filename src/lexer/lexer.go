@@ -146,22 +146,18 @@ loop:
 			valueBuilder.WriteString(fmt.Sprint(val))
 			break loop
 		case '$':
-			lex.next()
-			identifier, err := lex.readVariableIdentifier()
+			err := lex.readVariableIdentifier(&valueBuilder)
 			if err != nil {
 				return nil, err
 			}
 			tokenType = ttPubVarIdent
-			valueBuilder.WriteString(identifier)
 			break loop
 		case '§':
-			lex.next()
-			identifier, err := lex.readVariableIdentifier()
+			err := lex.readVariableIdentifier(&valueBuilder)
 			if err != nil {
 				return nil, err
 			}
 			tokenType = ttPrivVarIdent
-			valueBuilder.WriteString(identifier)
 			break loop
 		default:
 			identifier, err := lex.readIdentifier()
@@ -234,7 +230,7 @@ var DecimalRangeTable = &unicode.RangeTable{
 }
 
 // SingleSpecialRangeTable is a set of all ...
-var SpecialRangeTable = &unicode.RangeTable{
+var SingleSpecialRangeTable = &unicode.RangeTable{
 	R16: []unicode.Range16{
 		{'(', ')', 1},
 		{',', ',', 1},

@@ -1,22 +1,26 @@
 package lexer
 
 import (
+	"fmt"
 	"strings"
 	"unicode"
 )
 
-func (lex *Lexer) readVariableIdentifier() (varName string, err LexError) {
-	var varIdentifierBuilder strings.Builder
-	for unicode.Is(SingleSpecialRangeTable, lex.buffer[lex.position+1]) {
+func (lex *Lexer) readVariableIdentifier(varIdentifierBuilder *strings.Builder) (err LexError) {
+	fmt.Print(unicode.Is(VariableIdentifierRangeTable, '2'))
+	for lex.position+1 < lex.length && unicode.Is(VariableIdentifierRangeTable, lex.buffer[lex.position+1]) {
 		lex.next()
 		varIdentifierBuilder.WriteRune(lex.character)
 	}
-	return varIdentifierBuilder.String(), nil
+	return nil
 }
 
 // VariableIdentifierRangeTable is a set of all characters allowed in variable identifiers/names
 var VariableIdentifierRangeTable = &unicode.RangeTable{
 	R16: []unicode.Range16{
-		{'', ')', 1},
+		{'0', '9', 1},
+		{'A', 'Z', 1},
+		{'_', '_', 1},
+		{'a', 'z', 1},
 	},
 }
