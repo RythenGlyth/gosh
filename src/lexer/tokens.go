@@ -10,240 +10,240 @@ type TokenType uint8
 
 const (
 	// if nothing was found
-	ttEmpty TokenType = iota
-	ttIdentifier
+	TtEmpty TokenType = iota
+	TtIdentifier
 	// variables identifier need to be of the following form: [$§][A-Za-z_]+[A-z0-9_]*
 	// public variables identifier, starting with $ (until space)
-	ttPubVarIdent
+	TtPubVarIdent
 	// private variables identifier, starting with § (until space)
-	ttPrivVarIdent
+	TtPrivVarIdent
 	// string surrounded by quotes
-	ttString
+	TtString
 	// number in decimal, could also be in base 2 (0b) or in hex (0x)
-	ttNumber
+	TtNumber
 
-	ttTrue
-	ttFalse
-	ttIf
-	ttElse
-	ttFor
-	ttReturn
+	TtTrue
+	TtFalse
+	TtIf
+	TtElse
+	TtFor
+	TtReturn
 
-	ttLParen
-	ttRParen
+	TtLParen
+	TtRParen
 	// {: start of block
-	ttLBrace
+	TtLBrace
 	// }: end of block
-	ttRBrace
+	TtRBrace
 	// [: start of array
-	ttLBracket
+	TtLBracket
 	// ]: end of array
-	ttRBracket
-	ttSemicolon
-	ttComma
-	ttDot
+	TtRBracket
+	TtSemicolon
+	TtComma
+	TtDot
 	// Conditional expression
-	ttQuestion
+	TtQuestion
 	// Advanced Forloop or conditional expression
-	ttColon
+	TtColon
 
 	// Modulo
-	ttPercent
+	TtPercent
 	// multiplication
-	ttStar
+	TtStar
 	// division
-	ttSlash
+	TtSlash
 	// Line Comment
-	ttSlashSlash
+	TtSlashSlash
 	// Start of Block Comment
-	ttSlashStar
+	TtSlashStar
 	// End of Block Comment
-	ttStarSlash
-	ttPlus
-	ttMinus
-	ttBang
+	TtStarSlash
+	TtPlus
+	TtMinus
+	TtBang
 	// increase
-	ttPlusPlus
+	TtPlusPlus
 	// decrease
-	ttMinusMinus
+	TtMinusMinus
 	// And
-	ttAndAnd
+	TtAndAnd
 	// ||: Or
-	ttBarbar
+	TtBarbar
 	// Equals
-	ttEqEq
+	TtEqEq
 	// !=: Not Equals
-	ttBangEq
+	TtBangEq
 	// Smaller or equals
-	ttLtEq
+	TtLtEq
 	// Greater or equals
-	ttGtEq
+	TtGtEq
 	// Sets variables
-	ttEq
-	ttLt
-	ttGt
+	TtEq
+	TtLt
+	TtGt
 	// |: Pipe left into right
-	ttBar
+	TtBar
 	// Two Commands async at a time
-	ttAnd
-	ttPlusEq
-	ttMinusEq
-	ttStarEq
-	ttSlashEq
-	ttPerEq
+	TtAnd
+	TtPlusEq
+	TtMinusEq
+	TtStarEq
+	TtSlashEq
+	TtPerEq
 	// =>: arrow (for lambda)
-	ttEqGt
+	TtEqGt
 	// ->: arrow (for lambda)
-	ttMinusGt
+	TtMinusGt
 )
 
 // Token for the Lexer
 type Token struct {
-	tokenType TokenType
-	startPos  int
-	endPos    int
-	value     interface{}
+	TokenType TokenType
+	StartPos  int
+	EndPos    int
+	Value     interface{}
 }
 
-func (tt TokenType) String() string {
-	switch tt {
-	case ttIdentifier:
-		return "ttIdentifier"
-	case ttPubVarIdent:
-		return "ttPubVarIdent"
-	case ttPrivVarIdent:
-		return "ttPrivVarIdent"
-	case ttString:
-		return "ttString"
-	case ttNumber:
-		return "ttNumber"
-	case ttTrue:
-		return "ttTrue"
-	case ttFalse:
-		return "ttFalse"
-	case ttIf:
-		return "ttIf"
-	case ttElse:
-		return "ttElse"
-	case ttFor:
-		return "ttFor"
-	case ttReturn:
-		return "ttReturn"
-	case ttLParen:
-		return "ttLParen"
-	case ttRParen:
-		return "ttRParen"
-	case ttLBrace:
-		return "ttLBrace"
-	case ttRBrace:
-		return "ttRBrace"
-	case ttLBracket:
-		return "ttLBracket"
-	case ttRBracket:
-		return "ttRBracket"
-	case ttSemicolon:
-		return "ttSemicolon"
-	case ttComma:
-		return "ttComma"
-	case ttDot:
-		return "ttDot"
-	case ttQuestion:
-		return "ttQuestion"
-	case ttColon:
-		return "ttColon"
-	case ttPercent:
-		return "ttPercent"
-	case ttStar:
-		return "ttStar"
-	case ttSlash:
-		return "ttSlash"
-	case ttSlashSlash:
-		return "ttSlashSlash"
-	case ttSlashStar:
-		return "ttSlashStar"
-	case ttStarSlash:
-		return "ttStarSlash"
-	case ttPlus:
-		return "ttPlus"
-	case ttMinus:
-		return "ttMinus"
-	case ttBang:
-		return "ttBang"
-	case ttPlusPlus:
-		return "ttPlusPlus"
-	case ttMinusMinus:
-		return "ttMinusMinus"
-	case ttAndAnd:
-		return "ttAndAnd"
-	case ttBarbar:
-		return "ttBarbar"
-	case ttEqEq:
-		return "ttEqEq"
-	case ttBangEq:
-		return "ttBangEq"
-	case ttLtEq:
-		return "ttLtEq"
-	case ttGtEq:
-		return "ttGteq"
-	case ttEq:
-		return "ttEq"
-	case ttLt:
-		return "ttLt"
-	case ttGt:
-		return "ttGt"
-	case ttBar:
-		return "ttBar"
-	case ttAnd:
-		return "ttAnd"
-	case ttPlusEq:
-		return "ttPlusEq"
-	case ttMinusEq:
-		return "ttMinusEq"
-	case ttStarEq:
-		return "ttStarEq"
-	case ttSlashEq:
-		return "ttSlashEq"
-	case ttPerEq:
-		return "ttPerEq"
-	case ttEqGt:
-		return "ttEqGt"
-	case ttMinusGt:
-		return "ttMinusGt"
+func (Tt TokenType) String() string {
+	switch Tt {
+	case TtIdentifier:
+		return "TtIdentifier"
+	case TtPubVarIdent:
+		return "TtPubVarIdent"
+	case TtPrivVarIdent:
+		return "TtPrivVarIdent"
+	case TtString:
+		return "TtString"
+	case TtNumber:
+		return "TtNumber"
+	case TtTrue:
+		return "TtTrue"
+	case TtFalse:
+		return "TtFalse"
+	case TtIf:
+		return "TtIf"
+	case TtElse:
+		return "TtElse"
+	case TtFor:
+		return "TtFor"
+	case TtReturn:
+		return "TtReturn"
+	case TtLParen:
+		return "TtLParen"
+	case TtRParen:
+		return "TtRParen"
+	case TtLBrace:
+		return "TtLBrace"
+	case TtRBrace:
+		return "TtRBrace"
+	case TtLBracket:
+		return "TtLBracket"
+	case TtRBracket:
+		return "TtRBracket"
+	case TtSemicolon:
+		return "TtSemicolon"
+	case TtComma:
+		return "TtComma"
+	case TtDot:
+		return "TtDot"
+	case TtQuestion:
+		return "TtQuestion"
+	case TtColon:
+		return "TtColon"
+	case TtPercent:
+		return "TtPercent"
+	case TtStar:
+		return "TtStar"
+	case TtSlash:
+		return "TtSlash"
+	case TtSlashSlash:
+		return "TtSlashSlash"
+	case TtSlashStar:
+		return "TtSlashStar"
+	case TtStarSlash:
+		return "TtStarSlash"
+	case TtPlus:
+		return "TtPlus"
+	case TtMinus:
+		return "TtMinus"
+	case TtBang:
+		return "TtBang"
+	case TtPlusPlus:
+		return "TtPlusPlus"
+	case TtMinusMinus:
+		return "TtMinusMinus"
+	case TtAndAnd:
+		return "TtAndAnd"
+	case TtBarbar:
+		return "TtBarbar"
+	case TtEqEq:
+		return "TtEqEq"
+	case TtBangEq:
+		return "TtBangEq"
+	case TtLtEq:
+		return "TtLtEq"
+	case TtGtEq:
+		return "TtGteq"
+	case TtEq:
+		return "TtEq"
+	case TtLt:
+		return "TtLt"
+	case TtGt:
+		return "TtGt"
+	case TtBar:
+		return "TtBar"
+	case TtAnd:
+		return "TtAnd"
+	case TtPlusEq:
+		return "TtPlusEq"
+	case TtMinusEq:
+		return "TtMinusEq"
+	case TtStarEq:
+		return "TtStarEq"
+	case TtSlashEq:
+		return "TtSlashEq"
+	case TtPerEq:
+		return "TtPerEq"
+	case TtEqGt:
+		return "TtEqGt"
+	case TtMinusGt:
+		return "TtMinusGt"
 	default:
-		return "ttEmpty"
+		return "TtEmpty"
 	}
 }
 
 var MappedIt = map[string]TokenType{
-	"%":  ttPercent,
-	"*":  ttStar,
-	"/":  ttSlash,
-	"//": ttSlashSlash,
-	"/*": ttSlashStar,
-	"*/": ttStarSlash,
-	"+":  ttPlus,
-	"-":  ttMinus,
-	"!":  ttBang,
-	"++": ttPlusPlus,
-	"--": ttMinusMinus,
-	"&&": ttAndAnd,
-	"||": ttBarbar,
-	"==": ttEqEq,
-	"!=": ttBangEq,
-	"<=": ttLtEq,
-	">=": ttGtEq,
-	"=":  ttEq,
-	"<":  ttLt,
-	">":  ttGt,
-	"|":  ttBar,
-	"&":  ttAnd,
-	"+=": ttPlusEq,
-	"-=": ttMinusEq,
-	"*=": ttStarEq,
-	"/=": ttSlashEq,
-	"%=": ttPerEq,
-	"=>": ttEqGt,
-	"->": ttMinusGt,
+	"%":  TtPercent,
+	"*":  TtStar,
+	"/":  TtSlash,
+	"//": TtSlashSlash,
+	"/*": TtSlashStar,
+	"*/": TtStarSlash,
+	"+":  TtPlus,
+	"-":  TtMinus,
+	"!":  TtBang,
+	"++": TtPlusPlus,
+	"--": TtMinusMinus,
+	"&&": TtAndAnd,
+	"||": TtBarbar,
+	"==": TtEqEq,
+	"!=": TtBangEq,
+	"<=": TtLtEq,
+	">=": TtGtEq,
+	"=":  TtEq,
+	"<":  TtLt,
+	">":  TtGt,
+	"|":  TtBar,
+	"&":  TtAnd,
+	"+=": TtPlusEq,
+	"-=": TtMinusEq,
+	"*=": TtStarEq,
+	"/=": TtSlashEq,
+	"%=": TtPerEq,
+	"=>": TtEqGt,
+	"->": TtMinusGt,
 }
 
 func (t *Token) String() string {
@@ -254,16 +254,16 @@ func (t *Token) String() string {
 
 func (t *Token) StringifyIntoBuilder(builder *strings.Builder) {
 	builder.WriteRune('{')
-	builder.WriteString(t.tokenType.String())
+	builder.WriteString(t.TokenType.String())
 	builder.WriteRune(',')
 	builder.WriteRune(' ')
-	builder.WriteString(fmt.Sprint(t.startPos))
+	builder.WriteString(fmt.Sprint(t.StartPos))
 	builder.WriteRune(',')
 	builder.WriteRune(' ')
-	builder.WriteString(fmt.Sprint(t.endPos))
+	builder.WriteString(fmt.Sprint(t.EndPos))
 	builder.WriteRune(',')
 	builder.WriteRune(' ')
-	builder.WriteString(fmt.Sprintf("%v", t.value))
+	builder.WriteString(fmt.Sprintf("%v", t.Value))
 	builder.WriteRune('}')
 }
 

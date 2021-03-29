@@ -43,12 +43,12 @@ func (lex *Lexer) Lex() (*[]Token, LexError) {
 	lex.next()
 
 	for lex.position < lex.length {
-		token, err := lex.nextToken()
+		token, err := lex.nexTtoken()
 		if err != nil {
 			return &tokens, err
 		}
 
-		if token.tokenType != ttEmpty {
+		if token.TokenType != TtEmpty {
 			tokens = append(tokens, *token)
 		}
 	}
@@ -56,9 +56,9 @@ func (lex *Lexer) Lex() (*[]Token, LexError) {
 	return &tokens, nil
 }
 
-func (lex *Lexer) nextToken() (*Token, LexError) {
+func (lex *Lexer) nexTtoken() (*Token, LexError) {
 	var startPos int = lex.position
-	var tokenType TokenType = ttEmpty
+	var tokenType TokenType = TtEmpty
 	var valueBuilder strings.Builder
 
 loop:
@@ -76,13 +76,13 @@ loop:
 		}
 		switch lex.character {
 		case '(':
-			tokenType = ttLParen
+			tokenType = TtLParen
 			break loop
 		case ')':
-			tokenType = ttRParen
+			tokenType = TtRParen
 			break loop
 		case ',':
-			tokenType = ttComma
+			tokenType = TtComma
 			break loop
 		case '.':
 			if lex.position+1 < lex.length {
@@ -93,31 +93,31 @@ loop:
 					lex.next()
 
 					var endpos int = lex.position
-					return &Token{ttNumber, startPos, endpos, numVal}, nil
+					return &Token{TtNumber, startPos, endpos, numVal}, nil
 				}
 			}
-			tokenType = ttDot
+			tokenType = TtDot
 			break loop
 		case ':':
-			tokenType = ttColon
+			tokenType = TtColon
 			break loop
 		case ';':
-			tokenType = ttSemicolon
+			tokenType = TtSemicolon
 			break loop
 		case '?':
-			tokenType = ttQuestion
+			tokenType = TtQuestion
 			break loop
 		case '[':
-			tokenType = ttLBracket
+			tokenType = TtLBracket
 			break loop
 		case ']':
-			tokenType = ttRBracket
+			tokenType = TtRBracket
 			break loop
 		case '{':
-			tokenType = ttLBrace
+			tokenType = TtLBrace
 			break loop
 		case '}':
-			tokenType = ttRBrace
+			tokenType = TtRBrace
 			break loop
 		case '"', '\'':
 			stringQuotes := lex.character
@@ -131,7 +131,7 @@ loop:
 					return nil, &MissingQuoteError{Position{lex.codeXPos + 1, lex.codeYPos, lex.position + 1, lex}}
 				}
 			}
-			tokenType = ttString
+			tokenType = TtString
 			break loop
 		case '0':
 			if lex.position+1 < lex.length {
@@ -143,7 +143,7 @@ loop:
 					if err != nil {
 						return nil, err
 					}
-					tokenType = ttNumber
+					tokenType = TtNumber
 
 					lex.next()
 
@@ -156,7 +156,7 @@ loop:
 					if err != nil {
 						return nil, err
 					}
-					tokenType = ttNumber
+					tokenType = TtNumber
 
 					lex.next()
 
@@ -180,7 +180,7 @@ loop:
 					if err2 != nil {
 						return nil, err2
 					}
-					tokenType = ttNumber
+					tokenType = TtNumber
 
 					lex.next()
 
@@ -194,7 +194,7 @@ loop:
 			if err != nil {
 				return nil, err
 			}
-			tokenType = ttNumber
+			tokenType = TtNumber
 
 			lex.next()
 
@@ -205,25 +205,25 @@ loop:
 			if err != nil {
 				return nil, err
 			}
-			tokenType = ttPubVarIdent
+			tokenType = TtPubVarIdent
 			break loop
 		case '§':
 			err := lex.readVariableIdentifier(&valueBuilder)
 			if err != nil {
 				return nil, err
 			}
-			tokenType = ttPrivVarIdent
+			tokenType = TtPrivVarIdent
 			break loop
 		case '%', '*', '/', '+', '-', '|', '&', '=', '<', '>', '!':
-			tt, ok := MappedIt[string(lex.character)+string(lex.buffer[lex.position+1])]
+			Tt, ok := MappedIt[string(lex.character)+string(lex.buffer[lex.position+1])]
 			if lex.position+1 < lex.length && ok {
-				tokenType = tt
+				tokenType = Tt
 				lex.next()
 				break loop
 			} else {
-				tt, ok = MappedIt[string(lex.character)]
+				Tt, ok = MappedIt[string(lex.character)]
 				if ok {
-					tokenType = tt
+					tokenType = Tt
 					break loop
 				}
 			}
@@ -235,27 +235,27 @@ loop:
 			}
 			switch strings.ToLower(identifier) {
 			case "if":
-				tokenType = ttIf
+				tokenType = TtIf
 				valueBuilder.WriteString("if")
 			case "else":
-				tokenType = ttElse
+				tokenType = TtElse
 				valueBuilder.WriteString("else")
 			case "for", "while":
-				tokenType = ttFor
+				tokenType = TtFor
 				valueBuilder.WriteString("for")
 			case "return":
-				tokenType = ttReturn
+				tokenType = TtReturn
 				valueBuilder.WriteString("return")
 			case "true":
-				tokenType = ttTrue
+				tokenType = TtTrue
 				valueBuilder.WriteString("true")
 			case "false":
-				tokenType = ttFalse
+				tokenType = TtFalse
 				valueBuilder.WriteString("false")
 			case "do", "loop", "is", "try", "catch", "run", "switch", "case", "break", "continue", "register", "goto":
 				return nil, &ReservedIdentifierError{Position{lex.codeXPos, lex.codeYPos, lex.position, lex}, identifier}
 			default:
-				tokenType = ttString
+				tokenType = TtString
 				valueBuilder.WriteString(identifier)
 			}
 			break loop

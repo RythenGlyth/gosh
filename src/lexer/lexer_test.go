@@ -64,7 +64,7 @@ func TestVar(t *testing.T) {
 
 	t.Logf("\n%v\n", *tokens)
 
-	if !tokenArrayEqual(*tokens, []Token{{ttPrivVarIdent, 0, 9, "test23er"}, {ttPubVarIdent, 9, 21, "789test_01"}}) {
+	if !tokenArrayEqual(*tokens, []Token{{TtPrivVarIdent, 0, 9, "test23er"}, {TtPubVarIdent, 9, 21, "789test_01"}}) {
 		t.FailNow()
 	}
 }
@@ -77,19 +77,19 @@ func tokenArrayEqual(a, b []Token) bool {
 	for i, ta := range a {
 		tb := b[i]
 
-		if ta.endPos != tb.endPos {
+		if ta.EndPos != tb.EndPos {
 			fmt.Printf("endPos of %d (%v : %v) of differ\n", i, ta.String(), tb.String())
 			return false
 		}
-		if ta.startPos != tb.startPos {
+		if ta.StartPos != tb.StartPos {
 			fmt.Printf("startPos of %d (%v : %v) of differ\n", i, ta.String(), tb.String())
 			return false
 		}
-		if ta.tokenType != tb.tokenType {
+		if ta.TokenType != tb.TokenType {
 			fmt.Printf("tokenType of %d (%v : %v) of differ\n", i, ta.String(), tb.String())
 			return false
 		}
-		if ta.value != tb.value {
+		if ta.Value != tb.Value {
 			fmt.Printf("value of %d (%v : %v) of differ\n", i, ta.String(), tb.String())
 			return false
 		}
@@ -108,7 +108,7 @@ func TestIdentifier(t *testing.T) {
 
 	t.Logf("\n%v\n", *tokens)
 
-	if !tokenArrayEqual(*tokens, []Token{{ttIf, 0, 2, "if"}, {ttLParen, 2, 3, ""}, {ttRParen, 3, 4, ""}, {ttLBrace, 4, 6, ""}, {ttString, 6, 10, "sos"}, {ttString, 10, 14, "nä?"}, {ttString, 14, 18, "ife"}, {ttRBrace, 18, 20, ""}}) {
+	if !tokenArrayEqual(*tokens, []Token{{TtIf, 0, 2, "if"}, {TtLParen, 2, 3, ""}, {TtRParen, 3, 4, ""}, {TtLBrace, 4, 6, ""}, {TtString, 6, 10, "sos"}, {TtString, 10, 14, "nä?"}, {TtString, 14, 18, "ife"}, {TtRBrace, 18, 20, ""}}) {
 		t.FailNow()
 	}
 }
@@ -125,7 +125,7 @@ func TestNumerus(t *testing.T) { //TODO .5
 
 	t.Log(TokenArrayToString(tokens))
 
-	if !tokenArrayEqual(*tokens, []Token{{ttNumber, 0, 1, 3.0}, {ttNumber, 1, 7, 1040.0}, {ttNumber, 7, 13, 5.0}, {ttNumber, 13, 17, 3.1}, {ttNumber, 17, 22, 7.54}, {ttNumber, 22, 27, 3.01}, {ttNumber, 27, 33, 15.5}, {ttNumber, 33, 51, 3.000000000000001}, {ttNumber, 51, 58, 3.0}, {ttNumber, 58, 65, 54620.0}, {ttNumber, 65, 68, 0.5}, {ttNumber, 68, 73, 1.0 / 16}}) {
+	if !tokenArrayEqual(*tokens, []Token{{TtNumber, 0, 1, 3.0}, {TtNumber, 1, 7, 1040.0}, {TtNumber, 7, 13, 5.0}, {TtNumber, 13, 17, 3.1}, {TtNumber, 17, 22, 7.54}, {TtNumber, 22, 27, 3.01}, {TtNumber, 27, 33, 15.5}, {TtNumber, 33, 51, 3.000000000000001}, {TtNumber, 51, 58, 3.0}, {TtNumber, 58, 65, 54620.0}, {TtNumber, 65, 68, 0.5}, {TtNumber, 68, 73, 1.0 / 16}}) {
 		t.FailNow()
 	}
 }
@@ -141,7 +141,7 @@ func TestSpecials(t *testing.T) {
 
 	t.Log(TokenArrayToString(tokens))
 
-	if !tokenArrayEqual(*tokens, []Token{{ttString, 0, 15, "\uD55C\U00012323"}}) {
+	if !tokenArrayEqual(*tokens, []Token{{TtString, 0, 15, "\uD55C\U00012323"}}) {
 		t.FailNow()
 	}
 }
