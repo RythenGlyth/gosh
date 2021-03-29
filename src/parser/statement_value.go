@@ -28,6 +28,21 @@ func (cnvs *ConstNumberValueStatement) String() string {
 	return strconv.FormatFloat(cnvs.number, 'G', -1, 64)
 }
 
+type ConstVoidValueStatement struct {
+}
+
+func (cvvs *ConstVoidValueStatement) ValueType() ValueType {
+	return VTVoid
+}
+
+func (cvvs *ConstVoidValueStatement) GetValue() (interface{}, ParseError) {
+	return nil, nil
+}
+
+func (cvvs *ConstVoidValueStatement) String() string {
+	return "null"
+}
+
 type ConstStringValueStatement struct {
 	text string
 }
@@ -127,6 +142,7 @@ const (
 	VTArray
 	VTMap
 	VTIdentifer
+	VTVoid
 )
 
 func (vt ValueType) String() string {
@@ -141,6 +157,8 @@ func (vt ValueType) String() string {
 		return "string"
 	case VTIdentifer:
 		return "identifier"
+	case VTVoid:
+		return "void"
 	default:
 		return "invalid"
 	}

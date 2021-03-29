@@ -7,6 +7,6 @@ type ExecutionStatement struct {
 	arguments []ValueStatement
 }
 
-func (es *ExecutionStatement) Exec(gosh shared.IGosh) {
-
+func (es *ExecutionStatement) Exec(gosh shared.IGosh) ValueStatement {
+	return &ConstVoidValueStatement{} //TODO: Real Value
 }

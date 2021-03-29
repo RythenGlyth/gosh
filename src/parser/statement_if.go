@@ -8,14 +8,15 @@ type IfStatement struct {
 	statementNo        ExecutableStatement
 }
 
-func (is *IfStatement) Exec(gosh shared.IGosh) {
+func (is *IfStatement) Exec(gosh shared.IGosh) ValueStatement {
 	if is.conditionStatement.EvalCondition() {
 		if is.statementYes != nil {
-			is.statementYes.Exec(gosh)
+			return is.statementYes.Exec(gosh)
 		}
 	} else {
 		if is.statementNo != nil {
-			is.statementNo.Exec(gosh)
+			return is.statementNo.Exec(gosh)
 		}
 	}
+	return &ConstVoidValueStatement{}
 }

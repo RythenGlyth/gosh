@@ -6,8 +6,9 @@ type BlockStatement struct {
 	statements []ExecutableStatement
 }
 
-func (bs *BlockStatement) Exec(gosh shared.IGosh) {
+func (bs *BlockStatement) Exec(gosh shared.IGosh) ValueStatement {
 	for _, es := range bs.statements {
 		es.Exec(gosh)
 	}
+	return &ConstVoidValueStatement{} //TODO Real value
 }

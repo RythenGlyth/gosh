@@ -9,6 +9,6 @@ type AssignmentStatement struct {
 	variableToken lexer.Token
 }
 
-func (as *AssignmentStatement) Exec(gosh shared.IGosh) {
-
+func (as *AssignmentStatement) Exec(gosh shared.IGosh) ValueStatement {
+	return &ConstVoidValueStatement{}
 }
