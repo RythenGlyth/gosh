@@ -11,7 +11,7 @@ func (lex *Lexer) readIdentifier() (identifier string, err LexError) {
 	for lex.position+1 < lex.length && !unicode.IsSpace(lex.buffer[lex.position+1]) && !unicode.Is(SpecialRangeTable, lex.buffer[lex.position+1]) {
 		stringifiedIdentifierBuilder := identifierBuilder.String()
 
-		if lex.buffer[lex.position+1] == '(' && (stringifiedIdentifierBuilder == "if" || stringifiedIdentifierBuilder == "for" || stringifiedIdentifierBuilder == "while") {
+		if lex.buffer[lex.position+1] == '(' {
 			return stringifiedIdentifierBuilder, nil
 		}
 		lex.next()
