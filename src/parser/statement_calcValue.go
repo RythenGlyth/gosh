@@ -27,9 +27,29 @@ func (cvs *CalcValueStatement) GetValue() (interface{}, ParseError) {
 			return nil, &UnsupportedOperationError{cvs.left.ValueType(), cvs.right.ValueType(), cvs.operand}
 		case OTMultiply:
 			if cvs.left.ValueType() == VTNumber {
-				return strings.Repeat(cvs.right.GetValue().(string), int(cvs.left.GetValue().(float64))), nil
+				l, lErr := cvs.left.GetValue()
+				if lErr != nil {
+					return nil, lErr
+				}
+				lF := l.(float64)
+				r, rErr := cvs.right.GetValue()
+				if rErr != nil {
+					return nil, rErr
+				}
+				rS := r.(string)
+				return strings.Repeat(rS, int(lF)), nil
 			} else if cvs.right.ValueType() == VTNumber {
-				return strings.Repeat(cvs.left.GetValue().(string), int(cvs.right.GetValue().(float64))), nil
+				l, lErr := cvs.left.GetValue()
+				if lErr != nil {
+					return nil, lErr
+				}
+				lS := l.(string)
+				r, rErr := cvs.right.GetValue()
+				if rErr != nil {
+					return nil, rErr
+				}
+				rF := r.(float64)
+				return strings.Repeat(lS, int(rF)), nil
 			} else {
 				return nil, &UnsupportedOperationError{cvs.left.ValueType(), cvs.right.ValueType(), cvs.operand}
 			}
@@ -37,9 +57,15 @@ func (cvs *CalcValueStatement) GetValue() (interface{}, ParseError) {
 			return nil, &UnsupportedOperationError{cvs.left.ValueType(), cvs.right.ValueType(), cvs.operand}
 		}
 	} else if cvs.left.ValueType() == VTNumber && cvs.right.ValueType() == VTNumber {
-		l, _ := cvs.left.GetValue()
+		l, lErr := cvs.left.GetValue()
+		if lErr != nil {
+			return nil, lErr
+		}
 		lF := l.(float64)
-		r, _ := cvs.right.GetValue()
+		r, rErr := cvs.right.GetValue()
+		if rErr != nil {
+			return nil, rErr
+		}
 		rF := r.(float64)
 		switch cvs.operand {
 		case OTPlus:
@@ -53,9 +79,8 @@ func (cvs *CalcValueStatement) GetValue() (interface{}, ParseError) {
 		case OTModulo:
 			return math.Mod(lF, rF), nil
 		}
-	} else {
-		return nil, &UnsupportedOperationError{cvs.left.ValueType(), cvs.right.ValueType(), cvs.operand}
 	}
+	return nil, &UnsupportedOperationError{cvs.left.ValueType(), cvs.right.ValueType(), cvs.operand}
 }
 
 type OperandType uint8
