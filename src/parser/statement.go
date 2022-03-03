@@ -1,7 +1,11 @@
 package parser
 
-import "gosh/src/shared"
+import "io"
 
-type ExecutableStatement interface {
-	Exec(shared.IGosh) ValueStatement
+// EvalStmt is an evaluable statement.
+type EvalStmt interface {
+	// Value is not nil as long as RuntimeError is nil
+	Eval() (Value, RuntimeError)
+
+	Debug(out io.Writer, indent int, symbol string)
 }

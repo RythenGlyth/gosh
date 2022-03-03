@@ -5,42 +5,26 @@ import (
 	"gosh/src/lexer"
 )
 
+type RuntimeError interface {
+	error
+}
+
 type ParseError interface {
-	Error() string
-}
-
-type UnsupportedOperationError struct {
-	leftType  ValueType
-	rightType ValueType
-	operator  OperandType
-}
-
-func (e *UnsupportedOperationError) Error() string {
-	return fmt.Sprintf("Unsupported operation of %s %s %s", e.leftType, e.operator, e.rightType)
-}
-
-type UnsupportedConditionError struct {
-	leftType      ValueType
-	rightType     ValueType
-	conditionType ConditionType
-}
-
-func (e *UnsupportedConditionError) Error() string {
-	return fmt.Sprintf("Unsupported condition of %s %s %s", e.leftType, e.conditionType, e.rightType)
+	error
 }
 
 type UnexpectedTokenError struct {
 	is       lexer.TokenType
-	expected []lexer.TokenType
+	expected string
 }
 
 func (e *UnexpectedTokenError) Error() string {
 	return fmt.Sprintf("Unexpected token: %s. expected: %s", e.is, e.expected)
 }
 
-type MissingClosingBraceError struct {
+type UnexpectedEndOfFileError struct {
 }
 
-func (e *MissingClosingBraceError) Error() string {
-	return fmt.Sprintf("Missing closing brace")
+func (e *UnexpectedEndOfFileError) Error() string {
+	return fmt.Sprintf("Unexpected end of file")
 }
