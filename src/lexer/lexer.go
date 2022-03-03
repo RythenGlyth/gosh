@@ -68,6 +68,8 @@ loop:
 			if lex.character == '\n' {
 				lex.codeXPos = 0
 				lex.codeYPos++
+				tokenType = TtSemicolon
+				break loop
 			}
 			lex.next()
 			continue
