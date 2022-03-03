@@ -1,8 +1,6 @@
 package lexer
 
 import (
-	"encoding/hex"
-	"fmt"
 	"strconv"
 	"strings"
 	"unicode"
@@ -123,7 +121,6 @@ loop:
 			stringQuotes := lex.character
 			lex.next()
 			for lex.character != stringQuotes || lex.wasBackslash {
-				fmt.Print(string(lex.character))
 				if lex.position+1 < lex.length {
 					valueBuilder.WriteRune(lex.character)
 					lex.next()
@@ -296,12 +293,6 @@ func (lex *Lexer) next() LexError {
 func (lex *Lexer) nextPos() {
 	lex.position++
 	lex.codeXPos++
-
-	if lex.position >= 0 && lex.position < lex.length {
-		fmt.Print(hex.EncodeToString([]byte(string(lex.buffer[lex.position : lex.position+1]))))
-		fmt.Print(": " + strconv.FormatBool(lex.wasBackslash) + " : " + fmt.Sprint(lex.codeXPos))
-		defer fmt.Print("\n")
-	}
 }
 
 // BinaryRangeTable is a set of 0 and 1
