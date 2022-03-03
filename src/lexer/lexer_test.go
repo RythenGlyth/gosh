@@ -145,3 +145,15 @@ func TestSpecials(t *testing.T) {
 		t.FailNow()
 	}
 }
+
+func TestComments(t *testing.T) {
+	arr := []rune("//This is a comment\nthis not /* this is a comment as well*/ this not /*/")
+	lex := NewLexer(arr, len(arr), "../test/test.gosh")
+	tokens, lerr := lex.Lex()
+
+	if lerr != nil {
+		log.Fatal(lerr.Error())
+	}
+
+	t.Log(TokenArrayToString(tokens))
+}

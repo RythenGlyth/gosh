@@ -53,12 +53,6 @@ const (
 	TtStar
 	// division
 	TtSlash
-	// Line Comment
-	TtSlashSlash
-	// Start of Block Comment
-	TtSlashStar
-	// End of Block Comment
-	TtStarSlash
 	TtPlus
 	TtMinus
 	TtBang
@@ -157,12 +151,6 @@ func (Tt TokenType) String() string {
 		return "TtStar"
 	case TtSlash:
 		return "TtSlash"
-	case TtSlashSlash:
-		return "TtSlashSlash"
-	case TtSlashStar:
-		return "TtSlashStar"
-	case TtStarSlash:
-		return "TtStarSlash"
 	case TtPlus:
 		return "TtPlus"
 	case TtMinus:
@@ -218,9 +206,6 @@ var MappedIt = map[string]TokenType{
 	"%":  TtPercent,
 	"*":  TtStar,
 	"/":  TtSlash,
-	"//": TtSlashSlash,
-	"/*": TtSlashStar,
-	"*/": TtStarSlash,
 	"+":  TtPlus,
 	"-":  TtMinus,
 	"!":  TtBang,

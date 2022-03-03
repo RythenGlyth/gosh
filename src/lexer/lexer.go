@@ -214,7 +214,27 @@ loop:
 			}
 			tokenType = TtPrivVarIdent
 			break loop
-		case '%', '*', '/', '+', '-', '|', '&', '=', '<', '>', '!':
+		case '/':
+			if lex.position+1 < lex.length {
+				if lex.buffer[lex.position+1] == '*' {
+					lex.nextPos()
+					for lex.position+2 < lex.length && lex.buffer[lex.position+1] != '*' && lex.buffer[lex.position+2] != '/' {
+						lex.nextPos()
+					}
+					lex.nextPos()
+					lex.nextPos()
+					break loop
+				} else if lex.buffer[lex.position+1] == '/' {
+					lex.nextPos()
+					for lex.position+1 < lex.length && lex.buffer[lex.position+1] != '\n' {
+						lex.nextPos()
+					}
+					lex.nextPos()
+					break loop
+				}
+			}
+			fallthrough
+		case '%', '*', '+', '-', '|', '&', '=', '<', '>', '!':
 			Tt, ok := MappedIt[string(lex.character)+string(lex.buffer[lex.position+1])]
 			if lex.position+1 < lex.length && ok {
 				tokenType = Tt
