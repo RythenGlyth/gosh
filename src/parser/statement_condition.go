@@ -1,7 +1,9 @@
 package parser
 
+import "strconv"
+
 type ConditionStatement interface {
-	EvalCondition() bool
+	EvalCondition() (bool, ParseError)
 }
 
 type CompositeConditionStatement struct {
@@ -10,14 +12,55 @@ type CompositeConditionStatement struct {
 	conditionType CompositeConditionType
 }
 
-func (ccs *CompositeConditionStatement) EvalCondition() bool {
+func (ccs *CompositeConditionStatement) EvalCondition() (bool, ParseError) {
 	switch ccs.conditionType {
 	case CTAnd:
-		return ccs.a.EvalCondition() && ccs.b.EvalCondition()
+		boolA, errA := ccs.a.EvalCondition()
+		if errA != nil {
+			return false, errA
+		}
+		if boolA {
+			boolB, errB := ccs.b.EvalCondition()
+			if errB != nil {
+				return false, errB
+			}
+			return boolB, nil
+		}
+		return false, nil
 	case CTOr:
-		return ccs.a.EvalCondition() || ccs.b.EvalCondition()
+		boolA, errA := ccs.a.EvalCondition()
+		if errA != nil {
+			return false, errA
+		}
+		if boolA {
+			return true, nil
+		} else {
+			boolB, errB := ccs.b.EvalCondition()
+			if errB != nil {
+				return false, errB
+			}
+			return boolB, nil
+		}
 	}
-	return false
+	return false, nil
+}
+
+func (ccs *CompositeConditionStatement) ValueType() ValueType {
+	return VTBoolean
+}
+
+func (ccs *CompositeConditionStatement) GetValue() (interface{}, ParseError) {
+	val, err := ccs.EvalCondition()
+	return val, err
+}
+
+func (ccs *CompositeConditionStatement) String() string {
+	val, err := ccs.EvalCondition()
+	if err != nil {
+		return "booleanError"
+	} else {
+		return strconv.FormatBool(val)
+	}
 }
 
 type CompareConditionStatement struct {
@@ -85,20 +128,78 @@ func (ccs *CompareConditionStatement) EvalCondition() (bool, ParseError) {
 	return false, &UnsupportedConditionError{ccs.a.ValueType(), ccs.b.ValueType(), &ccs.conditionType}
 }
 
+func (ccs *CompareConditionStatement) ValueType() ValueType {
+	return VTBoolean
+}
+
+func (ccs *CompareConditionStatement) GetValue() (interface{}, ParseError) {
+	val, err := ccs.EvalCondition()
+	return val, err
+}
+
+func (ccs *CompareConditionStatement) String() string {
+	val, err := ccs.EvalCondition()
+	if err != nil {
+		return "booleanError"
+	} else {
+		return strconv.FormatBool(val)
+	}
+}
+
 type ConstantConditionStatement struct {
 	val bool
 }
 
-func (ccs *ConstantConditionStatement) EvalCondition() bool {
-	return ccs.val
+func (ccs *ConstantConditionStatement) EvalCondition() (bool, ParseError) {
+	return ccs.val, nil
+}
+
+func (ccs *ConstantConditionStatement) ValueType() ValueType {
+	return VTBoolean
+}
+
+func (ccs *ConstantConditionStatement) GetValue() (interface{}, ParseError) {
+	val, err := ccs.EvalCondition()
+	return val, err
+}
+
+func (ccs *ConstantConditionStatement) String() string {
+	val, err := ccs.EvalCondition()
+	if err != nil {
+		return "booleanError"
+	} else {
+		return strconv.FormatBool(val)
+	}
 }
 
 type NotConstantConditionStatement struct {
 	a ConditionStatement
 }
 
-func (nccs *NotConstantConditionStatement) EvalCondition() bool {
-	return !nccs.EvalCondition()
+func (nccs *NotConstantConditionStatement) EvalCondition() (bool, ParseError) {
+	val, err := nccs.EvalCondition()
+	if err != nil {
+		return false, err
+	}
+	return !val, nil
+}
+
+func (ccs *NotConstantConditionStatement) ValueType() ValueType {
+	return VTBoolean
+}
+
+func (ccs *NotConstantConditionStatement) GetValue() (interface{}, ParseError) {
+	val, err := ccs.EvalCondition()
+	return val, err
+}
+
+func (ccs *NotConstantConditionStatement) String() string {
+	val, err := ccs.EvalCondition()
+	if err != nil {
+		return "booleanError"
+	} else {
+		return strconv.FormatBool(val)
+	}
 }
 
 type ConditionType interface {

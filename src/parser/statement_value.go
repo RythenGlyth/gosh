@@ -142,6 +142,7 @@ const (
 	VTArray
 	VTMap
 	VTIdentifer
+	VTBoolean
 	VTVoid
 )
 
@@ -157,6 +158,8 @@ func (vt ValueType) String() string {
 		return "string"
 	case VTIdentifer:
 		return "identifier"
+	case VTBoolean:
+		return "boolean"
 	case VTVoid:
 		return "void"
 	default:
