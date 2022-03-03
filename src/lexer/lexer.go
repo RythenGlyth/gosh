@@ -172,7 +172,7 @@ loop:
 					}
 					lex.next()
 					lex.next()
-					radix, err := strconv.ParseFloat(numStringBuilder.String(), 10)
+					radix, err := strconv.ParseFloat(numStringBuilder.String(), 32)
 					if err != nil {
 						return nil, &NumberFormatError{Position{lex.codeXPos, lex.codeYPos, lex.position, lex}}
 					}

@@ -113,7 +113,7 @@ func TestIdentifier(t *testing.T) {
 	}
 }
 
-func TestNumerus(t *testing.T) { //TODO .5
+func TestNumerus(t *testing.T) {
 
 	arr := []rune("3 0x410 0b101 3.1 7.54 3.01 0xf.8 3.000000000000001 0r3:10 0xD55C .5 0x.1")
 	lex := NewLexer(arr, len(arr), "../test/test.gosh")
@@ -156,4 +156,39 @@ func TestComments(t *testing.T) {
 	}
 
 	t.Log(TokenArrayToString(tokens))
+}
+
+func TestNumbers(t *testing.T) {
+	should := make(map[string]float64)
+	should["15"] = 15.0
+	should["3.14"] = 3.14
+	should["0b1001"] = 9
+	should["0b11.1"] = 3.5
+	should["0r3:100"] = 9
+	should["0r1.5:11"] = 2.5
+
+	for text, shouldI := range should {
+		t.Logf("Parsing %s", text)
+
+		lex := NewLexer([]rune(text), len([]rune(text)), "f")
+		tokens, lerr := lex.Lex()
+
+		if lerr != nil {
+			t.Error(lerr)
+		}
+
+		if len(*tokens) != 1 {
+			t.Errorf("Wrong number of tokens, got %d", len(*tokens))
+		}
+
+		val, ok := (*tokens)[0].Value.(float64)
+
+		if !ok {
+			t.Errorf("Can't cast value to float")
+		}
+
+		if val != shouldI {
+			t.Errorf("Wrong value, expected %f, got %f", shouldI, val)
+		}
+	}
 }
