@@ -5,13 +5,13 @@ import (
 	"strings"
 )
 
-type BuiltinExit struct{}
+type Exit struct{}
 
-func (b *BuiltinExit) Match(line string) bool {
+func (b *Exit) Match(line string) bool {
 	return strings.HasPrefix("exit", line)
 }
 
-func (b *BuiltinExit) Eval(g shared.IGosh, line string) error {
+func (b *Exit) Eval(g shared.IGosh, line string) error {
 	g.WriteString("Goodbye.")
 	g.Close()
 

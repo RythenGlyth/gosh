@@ -5,13 +5,13 @@ import (
 	"strings"
 )
 
-type BuiltinPwd struct{}
+type Pwd struct{}
 
-func (b *BuiltinPwd) Match(line string) bool {
+func (b *Pwd) Match(line string) bool {
 	return strings.HasPrefix(line, "pwd")
 }
 
-func (b *BuiltinPwd) Eval(g shared.IGosh, line string) error {
+func (b *Pwd) Eval(g shared.IGosh, line string) error {
 	path, err := g.GetWD()
 	if err != nil {
 		return err

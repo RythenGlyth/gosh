@@ -6,13 +6,13 @@ import (
 	"strings"
 )
 
-type BuiltinCd struct{}
+type Cd struct{}
 
-func (b *BuiltinCd) Match(line string) bool {
+func (b *Cd) Match(line string) bool {
 	return strings.HasPrefix(line, "cd")
 }
 
-func (b *BuiltinCd) Eval(g shared.IGosh, line string) error {
+func (b *Cd) Eval(g shared.IGosh, line string) error {
 	parts := strings.Split(line, " ")
 
 	if len(parts) == 1 { // no parameter

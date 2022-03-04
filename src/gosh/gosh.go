@@ -99,9 +99,11 @@ func (g *Gosh) Init() error {
 	g.aliasm = &alias.Manager{}
 
 	// Register default builtins
-	g.RegisterBuiltin(&builtins.BuiltinExit{})
-	g.RegisterBuiltin(&builtins.BuiltinCd{})
-	g.RegisterBuiltin(&builtins.BuiltinPwd{})
+	g.RegisterBuiltin(&builtins.Exit{})
+	g.RegisterBuiltin(&builtins.Cd{})
+	g.RegisterBuiltin(&builtins.Pwd{})
+	g.RegisterBuiltin(&builtins.Alias{})
+	g.RegisterBuiltin(&builtins.Unset{})
 
 	return nil
 }

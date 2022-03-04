@@ -5,13 +5,13 @@ import (
 	"strings"
 )
 
-type BuiltinAlias struct{}
+type Alias struct{}
 
-func (b *BuiltinAlias) Match(line string) bool {
+func (b *Alias) Match(line string) bool {
 	return strings.HasPrefix(line, "alias")
 }
 
-func (b *BuiltinAlias) Eval(g shared.IGosh, line string) error {
+func (b *Alias) Eval(g shared.IGosh, line string) error {
 	words := strings.SplitN(line, " ", 4)
 	if len(words) == 0 {
 		return &ErrAliasBadUsage{"matcher"} // TODO print all aliases instead

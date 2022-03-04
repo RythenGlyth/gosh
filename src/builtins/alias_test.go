@@ -19,7 +19,7 @@ func (f AliasStub) GetAliasManager() shared.AliasManager {
 
 func TestAlias(t *testing.T) {
 	g := &AliasStub{test_util.GoshStub{T: t}, &alias.Manager{}}
-	a := &builtins.BuiltinAlias{}
+	a := &builtins.Alias{}
 
 	err := a.Eval(g, "alias foo=bar")
 	if err != nil {
