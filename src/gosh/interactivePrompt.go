@@ -2,6 +2,7 @@ package gosh
 
 import (
 	"container/list"
+	"gosh/src/shared"
 	"gosh/src/util"
 	"strconv"
 	"strings"
@@ -28,11 +29,11 @@ type PromptStyle interface {
 	// The int parameter indicates which prompt line is requested (starting with 0).
 	// All paddings and margins must be added inside the prompt style, as the style will
 	// be printed as-is and with no added spaces.
-	LeftPrompt(*Gosh, int) string
+	LeftPrompt(shared.IGosh, int) string
 
 	// RightPrompt returns the contents of the area on the right side of the screen.
 	// The contents should be returned from left to right
-	RightPrompt(*Gosh, int) string
+	RightPrompt(shared.IGosh, int) string
 }
 
 // NewPrompt creates a new prompt with the SimplePromptStyle style.
