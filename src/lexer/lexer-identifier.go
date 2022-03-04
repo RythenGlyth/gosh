@@ -8,7 +8,7 @@ import (
 func (lex *Lexer) readIdentifier() (identifier string, err LexError) {
 	var identifierBuilder strings.Builder
 	identifierBuilder.WriteRune(lex.character)
-	for lex.position+1 < lex.length && !unicode.IsSpace(lex.buffer[lex.position+1]) && !unicode.Is(SpecialRangeTable, lex.buffer[lex.position+1]) {
+	for lex.position+1 < lex.length && (!unicode.IsSpace(lex.buffer[lex.position+1]) || (lex.buffer[lex.position+1] == ' ' && lex.wasBackslash)) && !unicode.Is(SpecialRangeTable, lex.buffer[lex.position+1]) {
 		stringifiedIdentifierBuilder := identifierBuilder.String()
 
 		if lex.buffer[lex.position+1] == '(' {

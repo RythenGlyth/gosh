@@ -33,6 +33,8 @@ func (lex *Lexer) nextB(wasBackslash bool) LexError {
 				lex.character = '\\'
 			case '\'':
 				lex.character = '\''
+			case ' ':
+				lex.character = ' '
 			case '"':
 				lex.character = '"'
 			case 'x', 'u', 'U':

@@ -145,6 +145,21 @@ func TestSpecials(t *testing.T) {
 		t.FailNow()
 	}
 }
+func TestIdentifierSpace(t *testing.T) {
+	arr := []rune(`sas sos\ ses`)
+	lex := NewLexer(arr, len(arr), "../test/test.gosh")
+	tokens, lerr := lex.Lex()
+
+	if lerr != nil {
+		log.Fatal(lerr.Error())
+	}
+
+	t.Log(TokenArrayToString(tokens))
+
+	if !tokenArrayEqual(*tokens, []Token{{TtString, 0, 3, "sas"}, {TtString, 3, 12, "sos ses"}}) {
+		t.FailNow()
+	}
+}
 
 func TestComments(t *testing.T) {
 	arr := []rune("//This is a comment\nthis not /* this is a comment as well*/ this not /*/")
