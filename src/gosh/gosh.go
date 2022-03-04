@@ -2,6 +2,8 @@ package gosh
 
 import (
 	"fmt"
+	"gosh/src/alias"
+	"gosh/src/builtins"
 	"gosh/src/event"
 	"gosh/src/shared"
 	"io"
@@ -16,12 +18,14 @@ var keyCd termios.Key = termios.Key{Type: termios.KeyLetter, Mod: termios.ModCtr
 
 // Gosh implements the IGosh type
 type Gosh struct {
-	term    termios.Terminal
-	prompt  *Prompt
-	ready   bool
-	debug   shared.IDebugger
-	handler shared.IEventHandler
-	plugins shared.IPluginManager
+	term     termios.Terminal
+	prompt   *Prompt
+	ready    bool
+	debug    shared.IDebugger
+	handler  shared.IEventHandler
+	plugins  shared.IPluginManager
+	builtins []shared.Builtin
+	aliasm   shared.AliasManager
 }
 
 // InitError is an error that occurred during initialization of the gosh.
@@ -39,7 +43,7 @@ func (e *InitError) Error() string {
 
 // NewGosh creates a new, empty gosh but does not start it yet.
 func NewGosh() *Gosh {
-	return &Gosh{nil, nil, false, nil, nil, nil}
+	return &Gosh{nil, nil, false, nil, nil, nil, []shared.Builtin{}, nil}
 }
 
 func (g *Gosh) SetDebugger(c shared.IDebugger) {
@@ -56,6 +60,10 @@ func (g *Gosh) GetPluginManager() shared.IPluginManager {
 
 func (g *Gosh) GetEventHandler() shared.IEventHandler {
 	return g.handler
+}
+
+func (g *Gosh) GetAliasManager() shared.AliasManager {
+	return g.aliasm
 }
 
 // DebugMessage sends a message with the specified module identifier
@@ -88,7 +96,18 @@ func (g *Gosh) Init() error {
 
 	g.handler = event.NewEventHandler(g)
 
+	g.aliasm = &alias.Manager{}
+
+	// Register default builtins
+	g.RegisterBuiltin(&builtins.BuiltinExit{})
+	g.RegisterBuiltin(&builtins.BuiltinCd{})
+	g.RegisterBuiltin(&builtins.BuiltinPwd{})
+
 	return nil
+}
+
+func (g *Gosh) RegisterBuiltin(b shared.Builtin) {
+	g.builtins = append(g.builtins, b)
 }
 
 // Close closes all sub-parts of the gosh instance (I/O, the terminal).
@@ -161,30 +180,16 @@ func (g *Gosh) Interactive() (int, error) {
 
 // Eval evaluates the specified statement in the current namespace.
 func (g *Gosh) Eval(line string) {
+	if line == "" {
+		return
+	}
+
 	parts := strings.Split(line, " ")
 	if len(parts) == 0 || parts[0] == "" {
 		return
 	}
 
 	switch parts[0] {
-	case "exit":
-		g.WriteString("Goodbye.")
-		g.Close()
-	case "cd":
-		var err error
-
-		if len(parts) == 1 {
-			home, _ := os.UserHomeDir() //nolint errcheck // This will get implemented later in conjunction with the parser
-			err = g.changeWD(home)
-		} else {
-			err = g.changeWD(parts[1])
-		}
-
-		if err != nil {
-			g.WriteString("Error: ")
-			g.WriteString(err.Error())
-			g.WriteString("\r\n")
-		}
 	case "gst":
 		cmd := exec.Command("git", "status")
 
@@ -213,19 +218,13 @@ func (g *Gosh) Eval(line string) {
 	}
 }
 
-func (g *Gosh) changeWD(target string) error {
+func (g *Gosh) ChangeWD(target string) error {
 	return os.Chdir(target)
 }
 
-// GetWD returns a string representation of the current working directory.
-// ~ is returned if any error occurred (e. g. the directory was deleted).
-func (g *Gosh) GetWD() string {
-	wd, err := os.Getwd()
-	if err != nil {
-		return "~"
-	}
-
-	return wd
+// GetWD returns an absolute path for the current working directory.
+func (g *Gosh) GetWD() (string, error) {
+	return os.Getwd()
 }
 
 func (g *Gosh) Write(p []byte) (int, error) {
