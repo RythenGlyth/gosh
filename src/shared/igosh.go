@@ -4,7 +4,9 @@ package shared
 // It collects all modules of a gosh shell and
 // binds functionality to each module.
 type IGosh interface {
+	// WriteString writes the specified string to the gosh's terminal.
 	WriteString(string) (n int, err error)
+
 	Init() error
 
 	// Interactive returns a return code and the last error.

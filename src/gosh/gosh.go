@@ -233,7 +233,6 @@ func (g *Gosh) Write(p []byte) (int, error) {
 	return g.term.Write(p)
 }
 
-// WriteString writes the specified string to the gosh's terminal.
 func (g *Gosh) WriteString(s string) (int, error) {
 	return g.term.WriteString(s)
 }
