@@ -14,7 +14,7 @@ func (b *Alias) Match(line string) bool {
 func (b *Alias) Eval(g shared.IGosh, line string) error {
 	words := strings.SplitN(line, " ", 4)
 	if len(words) == 0 {
-		return &ErrAliasBadUsage{"matcher"} // TODO print all aliases instead
+		return &ErrMissingArg{"alias", "matcher"} // TODO print all aliases instead
 	}
 
 	global := words[1] == "-g" || words[1] == "--global"
@@ -32,7 +32,7 @@ func (b *Alias) Eval(g shared.IGosh, line string) error {
 	if split == -1 {
 		// attempt to split at space instead
 		if strings.Count(line, " ") > 3 || (!global && strings.Count(line, " ") > 2) {
-			return &ErrAliasBadUsage{"expansion"} // TODO print usage
+			return &ErrMissingArg{"alias", "expansion"} // TODO print usage
 		}
 
 		m = words[1]
@@ -51,12 +51,4 @@ func (b *Alias) Eval(g shared.IGosh, line string) error {
 	}
 
 	return nil
-}
-
-type ErrAliasBadUsage struct {
-	Missing string
-}
-
-func (e *ErrAliasBadUsage) Error() string {
-	return "missing " + e.Missing
 }
