@@ -236,3 +236,7 @@ func (g *Gosh) Write(p []byte) (int, error) {
 func (g *Gosh) WriteString(s string) (int, error) {
 	return g.term.WriteString(s)
 }
+
+func (g *Gosh) Size() (w int, h int) {
+	return int(g.term.GetSize().Width), int(g.term.GetSize().Height)
+}

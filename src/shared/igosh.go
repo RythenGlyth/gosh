@@ -1,9 +1,13 @@
 package shared
 
+import "io"
+
 // IGosh describes the main type of a gosh instance.
 // It collects all modules of a gosh shell and
 // binds functionality to each module.
 type IGosh interface {
+	io.Writer
+
 	// WriteString writes the specified string to the gosh's terminal.
 	WriteString(string) (n int, err error)
 
@@ -29,6 +33,10 @@ type IGosh interface {
 	GetPluginManager() IPluginManager
 
 	GetEventHandler() IEventHandler
+
+	// Size returns the terminal's readable size as width, height.
+	// If it is unknown, 80x24 should be returned.
+	Size() (w int, h int)
 }
 
 type Builtin interface {
