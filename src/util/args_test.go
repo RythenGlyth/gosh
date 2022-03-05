@@ -44,6 +44,30 @@ func TestArgs(t *testing.T) {
 	cmpargs(t, is, should)
 }
 
+func TestNParams(t *testing.T) {
+	sparams := map[rune]int{'l': 1}
+	lparams := map[string]int{}
+
+	line1 := "kill -l"
+	line2 := "kill -l 15"
+
+	should1 := &util.Args{Prog: "kill", SOps: []rune{'l'}}
+	should2 := &util.Args{Prog: "kill", NParams: map[string][]string{"l": {"15"}}}
+
+	is1, err := util.ParseLine(line1, sparams, lparams)
+	if err != nil {
+		t.Error(err)
+	}
+
+	is2, err := util.ParseLine(line2, sparams, lparams)
+	if err != nil {
+		t.Error(err)
+	}
+
+	cmpargs(t, is1, should1)
+	cmpargs(t, is2, should2)
+}
+
 func cmpargs(t *testing.T, is, should *util.Args) {
 	t.Helper()
 

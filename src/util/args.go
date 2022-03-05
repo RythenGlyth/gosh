@@ -65,7 +65,7 @@ func ParseLine(line string, sparams map[rune]int, lparams map[string]int) (*Args
 		} else if strings.HasPrefix(field, "--") {
 			op := field[2:]
 			n := containsS(op, lparams)
-			if n > 0 {
+			if n > 0 && i+n < len(fields) {
 				// parse values after op
 				args.NParams[op] = fields[i+1 : i+1+n]
 				i += n
@@ -76,7 +76,7 @@ func ParseLine(line string, sparams map[rune]int, lparams map[string]int) (*Args
 			op := field[1:]
 			for _, r := range op {
 				n := containsR(r, sparams)
-				if n > 0 {
+				if n > 0 && i+n < len(fields) {
 					// parse values after op
 					args.NParams[string(r)] = fields[i+1 : i+1+n]
 					i += n
