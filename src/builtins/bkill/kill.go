@@ -1,6 +1,7 @@
 package bkill
 
 import (
+	"fmt"
 	"gosh/src/shared"
 	"gosh/src/util"
 	"strconv"
@@ -98,6 +99,14 @@ func (b *Kill) listSignals(g shared.IGosh) error {
 }
 
 func (b *Kill) tableSignals(g shared.IGosh) error {
-	// TODO
+	var cells []string
+
+	for _, t := range allsigs {
+		cells = append(cells, fmt.Sprintf("%2d %s", t.sig, t.name))
+	}
+
+	w, _ := g.Size()
+	util.PrintTable(g, cells, w)
+
 	return nil
 }

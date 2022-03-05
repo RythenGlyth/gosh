@@ -23,4 +23,7 @@ func (g *GoshStub) GetWD() (string, error)                  { return "", nil }
 func (g *GoshStub) Init() error                             { return nil }
 func (g *GoshStub) Interactive() (int, error)               { return 0, nil }
 func (g *GoshStub) RegisterBuiltin(shared.Builtin)          {}
-func (g *GoshStub) WriteString(s string) (int, error)       { g.T.Log(s); return 0, nil }
+func (g *GoshStub) Write(bytes []byte) (int, error)         { g.T.Log(string(bytes)); return len(bytes), nil }
+func (g *GoshStub) WriteString(s string) (int, error)       { g.T.Log(s); return len(s), nil }
+
+func (g *GoshStub) Size() (int, int) { return 80, 24 }

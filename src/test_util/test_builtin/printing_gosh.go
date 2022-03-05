@@ -12,6 +12,10 @@ type PrintingGosh struct {
 	out io.Writer
 }
 
+func (g *PrintingGosh) Write(buf []byte) (n int, err error) {
+	return g.out.Write(buf)
+}
+
 func (g *PrintingGosh) WriteString(s string) (n int, err error) {
 	return fmt.Fprint(g.out, s)
 }

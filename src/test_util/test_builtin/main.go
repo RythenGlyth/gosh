@@ -3,12 +3,16 @@ package main
 import (
 	"fmt"
 	"gosh/src/builtins/bkill"
+	"gosh/src/gosh"
 	"os"
 	"strings"
 )
 
 func main() {
-	g := NewPrintingGosh()
+	g := gosh.NewGosh()
+	g.Init()
+	defer g.Close()
+
 	k := bkill.Kill{}
 	line := strings.Join(os.Args, " ")
 
